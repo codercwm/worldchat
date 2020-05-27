@@ -1,0 +1,17 @@
+laravel 6 要单独安装前端依赖，且要低于2.0版本，因为2.0版本是laravel7用的
+composer require laravel/ui:^1.0 --dev
+https://learnku.com/docs/laravel/6.x/frontend/5149
+
+npm install时出现npm ERR! EPROTO: protocol error, symlink
+使用以下命令
+npm install --no-bin-links
+
+没有layouts.app
+使用php artisan ui vue --auth生成
+
+npm run dev时报错提示sh: 1: cross-env: not found
+linux环境下是不需要安装 cross-env的，把package.json文件里的cross-env删掉就可以了
+
+npm run dev时报错
+emitting unnamed compat pluginError: EIO: i/o error, close
+把homestead的nfs关掉就可以了

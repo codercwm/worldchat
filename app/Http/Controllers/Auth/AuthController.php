@@ -20,38 +20,67 @@ class AuthController extends ApiBaseController
 
     public function register(AuthRequest $request)
     {
-        // 创建用户并返回信息
-        return User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
+        $params = $request->only(['email','avatar','password']);
+
+        $user = User::create([
+            'nickname' => substr($params['email'], 0, strpos($params['email'], '@')),
+            'email' => $params['email'],
+            'avatar' => $params['avatar'],
+            'password' => Hash::make($params['password']),
             'api_token' => Str::random(60)
         ]);
+        if ($user) {
+            return [
+                'errno' => 0,
+                'msg' => '注册成功',
+                'data' =>  $user
+            ];
+        } else {
+            return [
+                'errno' => 1,
+                'msg' => '保存用户到数据库失败',
+                'data' => []
+            ];
+        }
     }
 
     public function login(AuthRequest $request)
     {
-        //
-        $email = $request->input('email');
-        $password = $request->input('password');
-        $user = User::where('email', $email)->first();
-        // 进行验证
-        if ($user && Hash::check($password, $user->password)) {
-            //登录后更新token
+        $params = $request->only(['email','password']);
+        $user = User::where('email', $params['email'])->first();
+        // 用户校验成功则返回 Token 信息
+        if ($user && Hash::check($params['password'], $user->password)) {
             $user->api_token = Str::random(60);
             $user->save();
-            return response()->json(['user' => $user, 'success' => true]);
+            return [
+                'errno' => 0,
+                'msg' => '登录成功',
+                'data' => $user
+            ];
         }
 
-        return  response()->json(['success' => false]);
+        return [
+            'errno' => 1,
+            'msg' => '用户名或密码不正确，请重新输入',
+            'data' => []
+        ];
     }
 
     public function logout(Request $request)
     {
         $user = Auth::guard('auth:api')->user();
+        if (!$user) {
+            return [
+                'errno' => 1,
+                'msg' => '用户已退出'
+            ];
+        }
         $userModel = User::find($user->id);
-        $userModel->api_token = null;//退出登录情况token
+        $userModel->api_token = null;
         $userModel->save();
-        return response()->json(['success' => true]);
+        return [
+            'errno' => 0,
+            'msg' => '用户退出成功'
+        ];
     }
 }
