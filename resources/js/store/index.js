@@ -36,27 +36,7 @@ const store = new Vuex.Store({
         robotmsg: [{
                 username: ROBOT_NAME,
                 src: ROBOT_URL,
-                msg: '如果微信群过期了,添加作者微信(添加时记得备注:项目交流)'
-            },
-            {
-                username: ROBOT_NAME,
-                src: ROBOT_URL,
-                img: "https://xueyuanjun.com/wp-content/uploads/2015/07/wx_yaojinbu-150x150.jpg"
-            },
-            {
-                username: ROBOT_NAME,
-                src: ROBOT_URL,
-                msg: '期待你的加入'
-            },
-            {
-                username: ROBOT_NAME,
-                src: ROBOT_URL,
-                img: "https://xueyuanjun.com/wp-content/uploads/2019/06/94fe5973d09b0ad753082b6b1ba46f3d.jpeg"
-            },
-            {
-                username: ROBOT_NAME,
-                src: ROBOT_URL,
-                msg: '如果还有什么想知道的可以问我'
+                msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。'
             }
         ],
         unRead: {
@@ -195,8 +175,9 @@ const store = new Vuex.Store({
             const username = ROBOT_NAME;
             const src = ROBOT_URL;
             const res = await url.getRobotMessage(data);
+
             if (res) {
-                const robotdata = JSON.parse(res.data.data);
+                const robotdata = res.data.data;
                 let msg = '';
                 // 分类信息
                 if (robotdata.code === 100000) {
@@ -206,6 +187,7 @@ const store = new Vuex.Store({
                 } else {
                     msg = '暂不支持此类对话';
                 }
+                msg = robotdata.text;
                 commit('setRobotMsg', {
                     msg,
                     username,

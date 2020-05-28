@@ -2461,18 +2461,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -3138,24 +3126,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _this.$store.commit("setTab", true); // 只全局监听一次
+              _this.$store.commit("setTab", true);
 
+              alert(1); // 只全局监听一次
 
               if (!_this.isLogin) {
-                // 登录了,发送进入信息。
+                alert(2); // 登录了,发送进入信息。
+
                 if (_this.userid) {
-                  // 处理未读消息
+                  alert(3); // 处理未读消息
+
                   _socket__WEBPACK_IMPORTED_MODULE_2__["default"].on("count", function (userCount) {
                     _this.$store.commit("setUnread", userCount);
 
                     console.log(userCount);
                   });
+                  alert(4);
 
                   _this.$store.commit("setLoginState", true);
+
+                  alert(5);
                 }
               }
 
-            case 2:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -32936,9 +32930,9 @@ var render = function() {
                 _vm._v(" "),
                 _c("div", { staticClass: "center" }, [
                   _vm._v(
-                    "\n          聊天(" +
+                    "\n                    聊天(" +
                       _vm._s(Object.keys(_vm.getUsers).length) +
-                      ")\n        "
+                      ")\n                "
                   )
                 ]),
                 _vm._v(" "),
@@ -51412,14 +51406,14 @@ _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyn
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          console.log('websocket connected: ' + _socket__WEBPACK_IMPORTED_MODULE_5__["default"].connected);
+          console.log('websocket 已连接: ' + _socket__WEBPACK_IMPORTED_MODULE_5__["default"].connected);
           roomId = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_6__["queryString"])(window.location.href, 'roomId');
           userId = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.userid;
           token = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.token;
 
           if (userId) {
             _socket__WEBPACK_IMPORTED_MODULE_5__["default"].emit('login', {
-              name: userId,
+              email: userId,
               api_token: token
             });
           }
@@ -51430,7 +51424,7 @@ _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyn
           }
 
           obj = {
-            name: userId,
+            email: userId,
             src: _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.src,
             roomid: roomId
           };
@@ -51471,7 +51465,7 @@ _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyn
   }, _callee);
 })));
 _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('disconnect', function () {
-  console.log('websocket disconnected:' + _socket__WEBPACK_IMPORTED_MODULE_5__["default"].disconnected);
+  console.log('websocket 已断开:' + _socket__WEBPACK_IMPORTED_MODULE_5__["default"].disconnected);
   _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit('setDiscount', true);
 });
 _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('message', function (obj) {
@@ -53268,23 +53262,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
     robotmsg: [{
       username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
       src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      msg: '如果微信群过期了,添加作者微信(添加时记得备注:项目交流)'
-    }, {
-      username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
-      src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      img: "https://xueyuanjun.com/wp-content/uploads/2015/07/wx_yaojinbu-150x150.jpg"
-    }, {
-      username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
-      src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      msg: '期待你的加入'
-    }, {
-      username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
-      src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      img: "https://xueyuanjun.com/wp-content/uploads/2019/06/94fe5973d09b0ad753082b6b1ba46f3d.jpeg"
-    }, {
-      username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
-      src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      msg: '如果还有什么想知道的可以问我'
+      msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。'
     }],
     unRead: {
       room1: 0,
@@ -53543,7 +53521,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
                 res = _context6.sent;
 
                 if (res) {
-                  robotdata = JSON.parse(res.data.data);
+                  robotdata = res.data.data;
                   msg = ''; // 分类信息
 
                   if (robotdata.code === 100000) {
@@ -53554,6 +53532,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
                     msg = '暂不支持此类对话';
                   }
 
+                  msg = robotdata.text;
                   commit('setRobotMsg', {
                     msg: msg,
                     username: username,

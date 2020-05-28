@@ -25,11 +25,23 @@ WebsocketProxy::on('disconnect', function (WebSocket $websocket) {
 });
 
 WebsocketProxy::on('login', function (WebSocket $websocket, $data) {
-    if (!empty($data['token']) && ($user = \App\Models\User::where('api_token', $data['token'])->first())) {
+    if(!empty($data['token']) && ($user=\App\Models\User::where('api_token',$data['token'])->first())){
         $websocket->loginUsing($user);
-        // todo 读取未读消息
-        $websocket->toUser($user)->emit('login', '登录成功');
-    } else {
-        $websocket->emit('login', '登录后才能进入聊天室');
+        //获取未读消息
+        $res = \App\Models\Count::where('user_id',$user->id)->whereIn('room_id',\App\Models\Count::$ROOMLIST)->get();
+        $rooms = [];
+        foreach (\App\Models\Count::$ROOMLIST as $roomid){
+            $result = $res->where('room_id',$roomid)->first();
+            $roomid = 'room'.$roomid;
+            if($result){
+                $rooms[$roomid] = $result->count;
+            }else{
+                $rooms[$roomid] = 0;
+            }
+        }
+        \Illuminate\Support\Facades\Log::info(print_r($rooms,true));
+        $websocket->toUser($user)->emit('count',$rooms);
+    }else{
+        $websocket->emit('login','登录后才能进入聊天室');
     }
 });

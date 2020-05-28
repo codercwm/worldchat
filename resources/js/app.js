@@ -38,19 +38,19 @@ const popNotice = function(msgInfo) {
 };
 
 socket.on('connect', async () => {
-    console.log('websocket connected: ' + socket.connected);
+    console.log('websocket 已连接: ' + socket.connected);
     const roomId = queryString(window.location.href, 'roomId');
     const userId = store.state.userInfo.userid;
     const token = store.state.userInfo.token;
     if (userId) {
         socket.emit('login', {
-            name: userId,
+            email: userId,
             api_token: token
         });
     }
     if (roomId) {
         const obj = {
-            name: userId,
+            email: userId,
             src: store.state.userInfo.src,
             roomid: roomId
         };
@@ -70,7 +70,7 @@ socket.on('connect', async () => {
 });
 
 socket.on('disconnect', () => {
-    console.log('websocket disconnected:' + socket.disconnected);
+    console.log('websocket 已断开:' + socket.disconnected);
     store.commit('setDiscount', true);
 });
 
