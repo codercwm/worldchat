@@ -1,3 +1,4 @@
+//获取url参数
 export function queryString(url, key) {
     const query = url.split('?')[1];
     const obj = {};

@@ -1862,7 +1862,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["name", "img", "msg", "head", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
+  props: ["name", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
   computed: {
     getdate: function getdate() {
       return Object(_utils_date__WEBPACK_IMPORTED_MODULE_0__["default"])(new Date(this.mytime), "yyyy-MM-dd HH:mm:ss");
@@ -1875,16 +1875,15 @@ __webpack_require__.r(__webpack_exports__);
         return "<a style=\"color: #b374ff\" href=\"".concat(Object(xss_filters_es6__WEBPACK_IMPORTED_MODULE_1__["uriInUnQuotedAttr"])(url), "\" target=\"_blank\">").concat(Object(xss_filters_es6__WEBPACK_IMPORTED_MODULE_1__["uriInUnQuotedAttr"])(url), "</a>");
       });
     },
-    avatar: function avatar() {
-      var avatar = this.head;
-      var reg = /\.\/static\/img\/(\d+)\.jpg/;
-      var matches = this.head.match(reg);
-
+    headimg: function headimg() {
+      return '';
+      /*let headimg = this.avatar;
+      const reg = /\.\/static\/img\/(\d+)\.jpg/;
+      const matches = this.avatar.match(reg);
       if (matches) {
-        avatar = "//s3.qiufengh.com/avatar/".concat(matches[1], ".jpeg");
+        headimg = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
       }
-
-      return "".concat(avatar, "?imageView2/2/w/120/h/120");
+      return `${headimg}?imageView2/2/w/120/h/120`;*/
     },
     pic: function pic() {
       var pic = this.img;
@@ -2481,7 +2480,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         noticeVersion = notice.noticeVersion;
     return {
       isloading: false,
-      roomid: '',
+      room_id: '',
       container: {},
       chatValue: '',
       emoji: _utils_emoji__WEBPACK_IMPORTED_MODULE_3__["default"],
@@ -2496,13 +2495,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var roomId, res;
+      var roomId, data, res;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               roomId = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_5__["queryString"])(window.location.href, 'roomId');
-              _this.roomid = roomId;
+              _this.room_id = roomId;
 
               if (!roomId) {
                 _this.$router.push({
@@ -2517,11 +2516,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
               }
 
-              _context.next = 6;
-              return _api_server__WEBPACK_IMPORTED_MODULE_10__["default"].getNotice();
+              data = {
+                api_token: _this.auth_token
+              };
+              _context.next = 7;
+              return _api_server__WEBPACK_IMPORTED_MODULE_10__["default"].getNotice(data);
 
-            case 6:
+            case 7:
               res = _context.sent;
+              // this.noticeList = [{"title":"欢迎您的到来，你可以自由发言"},{"href":"JavaScript:;"}];
               _this.noticeList = res.data.noticeList;
 
               if (res.data.version !== res.data.version) {
@@ -2530,7 +2533,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.noticeVersion = res.data.version;
 
-            case 10:
+            case 11:
             case "end":
               return _context.stop();
           }
@@ -2551,7 +2554,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               Object(_utils_ios__WEBPACK_IMPORTED_MODULE_12__["default"])();
               _this2.container = document.querySelector('.chat-inner'); // socket内部，this指针指向问题
 
-              that = _this2;
+              that = _this2; //初始化房间信息，这里时清空了房间信息
+
               _context4.next = 5;
               return _this2.$store.commit('setRoomDetailInfos');
 
@@ -2563,13 +2567,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               obj = {
                 name: _this2.userid,
                 src: _this2.src,
-                roomid: _this2.roomid,
+                room_id: _this2.room_id,
                 api_token: _this2.auth_token
-              };
-              _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('room', obj);
+              }; //对websocket服务器通道路由room发起请求
+
+              _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('room', obj); //监听服务端进入房间的返回消息
+
               _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('room', function (obj) {
                 that.$store.commit('setUsers', obj);
-              });
+              }); //监听服务端退出房间的返回消息
+
               _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('roomout', function (obj) {
                 that.$store.commit('setUsers', obj);
               });
@@ -2582,11 +2589,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       case 0:
                         data = {
                           total: +_this2.getTotal,
+                          //消息总数
                           current: +_this2.current,
-                          roomid: _this2.roomid,
+                          //当前页，用于分页
+                          room_id: _this2.room_id,
+                          //房间id
                           api_token: _this2.auth_token
                         };
-                        _this2.isloading = true;
+                        _this2.isloading = true; //获取历史聊天记录
+
                         _context2.next = 4;
                         return _this2.$store.dispatch('getAllMessHistory', data);
 
@@ -2604,7 +2615,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
                 }, _callee2);
-              })), 500);
+              })), 500); //滚动时获取聊天记录翻页
 
               _this2.container.addEventListener('scroll', lodash_debounce__WEBPACK_IMPORTED_MODULE_9___default()( /*#__PURE__*/function () {
                 var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(e) {
@@ -2623,7 +2634,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                           data = {
                             total: +_this2.getTotal,
                             current: +_this2.getCurrent,
-                            roomid: _this2.roomid,
+                            room_id: _this2.room_id,
                             api_token: _this2.auth_token
                           };
                           _this2.isloading = true;
@@ -2644,7 +2655,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return function (_x) {
                   return _ref2.apply(this, arguments);
                 };
-              }(), 50));
+              }(), 50)); // Emoji 表情图标点击后的处理
+
 
               _this2.$refs.emoji.addEventListener('click', function (e) {
                 var target = e.target || e.srcElement;
@@ -2692,7 +2704,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     goback: function goback() {
       var obj = {
         name: this.userid,
-        roomid: this.roomid,
+        room_id: this.room_id,
         api_token: this.auth_token
       };
       _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('roomout', obj);
@@ -2712,7 +2724,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var formdata = new window.FormData();
         formdata.append('file', file1);
         formdata.append('api_token', that.auth_token);
-        formdata.append('roomid', that.roomid);
+        formdata.append('room_id', that.room_id);
         this.$store.dispatch('uploadImg', formdata);
         var fr = new window.FileReader();
 
@@ -2722,7 +2734,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             src: that.src,
             img: fr.result,
             msg: '',
-            roomid: that.roomid,
+            room_id: that.room_id,
             time: new Date(),
             api_token: that.auth_token
           };
@@ -2746,7 +2758,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (this.chatValue !== '') {
         if (this.chatValue.length > 200) {
           Object(_components_Alert__WEBPACK_IMPORTED_MODULE_8__["default"])({
-            content: '请输入100字以内'
+            content: '字数不能超过100'
           });
           return;
         }
@@ -2758,7 +2770,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           src: this.src,
           img: '',
           msg: msg,
-          roomid: this.roomid,
+          room_id: this.room_id,
           time: new Date(),
           api_token: this.auth_token
         }; // 传递消息信息
@@ -3126,30 +3138,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _this.$store.commit("setTab", true);
+              _this.$store.commit("setTab", true); // 只全局监听一次
 
-              alert(1); // 只全局监听一次
 
               if (!_this.isLogin) {
-                alert(2); // 登录了,发送进入信息。
-
+                //这个表示进行了登录操作才会触发
+                // 登录了,发送进入信息。
                 if (_this.userid) {
-                  alert(3); // 处理未读消息
-
+                  // 处理未读消息
                   _socket__WEBPACK_IMPORTED_MODULE_2__["default"].on("count", function (userCount) {
                     _this.$store.commit("setUnread", userCount);
 
                     console.log(userCount);
                   });
-                  alert(4);
 
                   _this.$store.commit("setLoginState", true);
-
-                  alert(5);
                 }
               }
 
-            case 3:
+            case 2:
             case "end":
               return _context.stop();
           }
@@ -32473,7 +32480,7 @@ var render = function() {
         _c("span", { staticClass: "head-place" }, [
           _c("img", {
             staticClass: "head",
-            attrs: { src: _vm.avatar, alt: "" }
+            attrs: { src: _vm.headimg, alt: "" }
           })
         ]),
         _vm._v(" "),
@@ -51296,7 +51303,7 @@ var Service = {
   },
   // 获取当前房间所有历史聊天记录
   RoomHistoryAll: function RoomHistoryAll(data) {
-    return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/history/message', {
+    return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/message/history', {
       params: data
     });
   },
@@ -51323,8 +51330,10 @@ var Service = {
     });
   },
   // 请求公告
-  getNotice: function getNotice() {
-    return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('https://s3.qiufengh.com/config/notice-config.js');
+  getNotice: function getNotice(data) {
+    return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/notice', {
+      params: data
+    });
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (Service);
@@ -51398,7 +51407,8 @@ var popNotice = function popNotice(msgInfo) {
       notification.close();
     };
   }
-};
+}; //监听后端emit过来的connect事件
+
 
 _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
   var roomId, userId, token, obj;
@@ -51418,46 +51428,29 @@ _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyn
             });
           }
 
-          if (!roomId) {
-            _context.next = 19;
-            break;
+          if (roomId) {
+            obj = {
+              email: userId,
+              src: _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.src,
+              roomid: roomId,
+              api_token: token
+            };
+            _socket__WEBPACK_IMPORTED_MODULE_5__["default"].emit('room', obj); //这里干嘛要这样？不知道，先不要
+
+            /*if (store.state.isDiscount) {
+                await store.commit('setRoomDetailInfos');
+                await store.commit('setCurrent', 1);
+                await store.commit('setDiscount', false);
+                await store.commit('setTotal', 0);
+                await store.dispatch('getAllMessHistory', {
+                    current: 1,
+                    roomid: roomId,
+                    api_token: token
+                });
+            }*/
           }
 
-          obj = {
-            email: userId,
-            src: _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.src,
-            roomid: roomId
-          };
-          _socket__WEBPACK_IMPORTED_MODULE_5__["default"].emit('room', obj);
-
-          if (!_store__WEBPACK_IMPORTED_MODULE_4__["default"].state.isDiscount) {
-            _context.next = 19;
-            break;
-          }
-
-          _context.next = 11;
-          return _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit('setRoomDetailInfos');
-
-        case 11:
-          _context.next = 13;
-          return _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit('setCurrent', 1);
-
-        case 13:
-          _context.next = 15;
-          return _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit('setDiscount', false);
-
-        case 15:
-          _context.next = 17;
-          return _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit('setTotal', 0);
-
-        case 17:
-          _context.next = 19;
-          return _store__WEBPACK_IMPORTED_MODULE_4__["default"].dispatch('getAllMessHistory', {
-            current: 1,
-            roomid: roomId
-          });
-
-        case 19:
+        case 6:
         case "end":
           return _context.stop();
       }
@@ -53255,6 +53248,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
       id: '',
       users: {},
       infos: [],
+      //保存消息列表
       current: 1,
       total: 0
     },
@@ -53333,7 +53327,9 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
       (_state$roomdetail$inf = state.roomdetail.infos).push.apply(_state$roomdetail$inf, _toConsumableArray(data));
     },
     addRoomDefatilInfosHis: function addRoomDefatilInfosHis(state, data) {
-      var list = state.roomdetail.infos;
+      //state.roomdetail.infos是用来保存消息列表的
+      var list = state.roomdetail.infos; //这里把传入来的消息列表合并起来
+
       state.roomdetail.infos = data.concat(list);
     },
     setRoomDetailInfos: function setRoomDetailInfos(state) {
@@ -53488,11 +53484,12 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
               case 3:
                 res = _context5.sent;
 
-                if (res.data.data.errno === 0) {
-                  commit('addRoomDefatilInfosHis', res.data.data.data);
+                if (res.data.errno === 0) {
+                  //这里把list传入去，list是历史消息列表
+                  commit('addRoomDefatilInfosHis', res.data.data.list);
 
                   if (!state.roomdetail.total) {
-                    commit('setTotal', res.data.data.total);
+                    commit('setTotal', res.data.data.message_total);
                   }
                 }
 
@@ -53763,6 +53760,7 @@ function clear() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "queryString", function() { return queryString; });
+//获取url参数
 function queryString(url, key) {
   var query = url.split('?')[1];
   var obj = {};

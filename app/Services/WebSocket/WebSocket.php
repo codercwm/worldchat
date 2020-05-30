@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\WebSocket;
 
+use App\Services\LogService;
 use App\Services\Websocket\Rooms\RoomContract;
 use Illuminate\Support\Facades\App;
 use Swoole\WebSocket\Server;
@@ -91,7 +92,6 @@ class WebSocket
     public function to($values): self
     {
         $values = is_string($values) || is_integer($values) ? func_get_args() : $values;
-
         foreach ($values as $value) {
             if (! in_array($value, $this->to)) {
                 $this->to[] = $value;
@@ -286,13 +286,20 @@ class WebSocket
      */
     protected function getFds()
     {
+        //把$this->to中不是整数的元素去掉
+        //$fds = $this->to中所有的整数元素
+        //所以roomid是不能够已整数的形式存在的，否则会被认为是fd
         $fds = array_filter($this->to, function ($value) {
             return is_integer($value);
         });
+        //获取 $this->to 中除去上面的元素之外的其它元素
         $rooms = array_diff($this->to, $fds);
+
+        //以上操作是为了把房间和用户分开，$rooms是房间，$fds是用户
 
         foreach ($rooms as $room) {
             $clients = $this->room->getClients($room);
+            LogService::write($room.'里面有fd : '.json_encode($clients),'room_in_out');
             // fallback fd with wrong type back to fds array
             if (empty($clients) && is_numeric($room)) {
                 $fds[] = $room;

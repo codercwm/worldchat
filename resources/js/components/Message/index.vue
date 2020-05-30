@@ -5,7 +5,7 @@
                 <span v-if="mytime">{{getdate}}</span> &nbsp;&nbsp;{{name}}
             </div>
             <span class="head-place">
-                <img :src="avatar" alt="" class="head">
+                <img :src="headimg" alt="" class="head">
             </span>
             <div v-if="img">
                 <img
@@ -28,7 +28,7 @@
 import dateFormat from "../../utils/date";
 import { inHTMLData, uriInUnQuotedAttr } from "xss-filters-es6";
 export default {
-  props: ["name", "img", "msg", "head", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
+  props: ["name", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
   computed: {
     getdate() {
       return dateFormat(new Date(this.mytime), "yyyy-MM-dd HH:mm:ss");
@@ -46,14 +46,15 @@ export default {
         }
       );
     },
-    avatar() {
-      let avatar = this.head;
+    headimg() {
+        return '';
+      /*let headimg = this.avatar;
       const reg = /\.\/static\/img\/(\d+)\.jpg/;
-      const matches = this.head.match(reg);
+      const matches = this.avatar.match(reg);
       if (matches) {
-        avatar = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
+        headimg = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
       }
-      return `${avatar}?imageView2/2/w/120/h/120`;
+      return `${headimg}?imageView2/2/w/120/h/120`;*/
     },
     pic() {
       let pic = this.img;

@@ -121,7 +121,7 @@
             const {noticeBar, noticeVersion} = notice;
             return {
                 isloading: false,
-                roomid: '',
+                room_id: '',
                 container: {},
                 chatValue: '',
                 emoji: emoji,
@@ -134,7 +134,7 @@
         },
         async created() {
             const roomId = queryString(window.location.href, 'roomId');
-            this.roomid = roomId;
+            this.room_id = roomId;
             if (!roomId) {
                 this.$router.push({path: '/'});
             }
@@ -142,7 +142,11 @@
                 // 防止未登录
                 this.$router.push({path: '/login'});
             }
-            const res = await url.getNotice();
+            const data = {
+                api_token: this.auth_token
+            };
+            const res = await url.getNotice(data);
+            // this.noticeList = [{"title":"欢迎您的到来，你可以自由发言"},{"href":"JavaScript:;"}];
             this.noticeList = res.data.noticeList;
             if (res.data.version !== res.data.version) {
                 this.noticeBar = false;
@@ -150,35 +154,43 @@
             this.noticeVersion = res.data.version;
         },
         async mounted() {
+
             // 微信 回弹 bug
             ios();
             this.container = document.querySelector('.chat-inner');
             // socket内部，this指针指向问题
             const that = this;
+            //初始化房间信息，这里时清空了房间信息
             await this.$store.commit('setRoomDetailInfos');
+            //初始化消息数量
             await this.$store.commit('setTotal', 0);
             const obj = {
                 name: this.userid,
                 src: this.src,
-                roomid: this.roomid,
+                room_id: this.room_id,
                 api_token: this.auth_token
             };
+            //对websocket服务器通道路由room发起请求
             socket.emit('room', obj);
+            //监听服务端进入房间的返回消息
             socket.on('room', function (obj) {
                 that.$store.commit('setUsers', obj);
             });
+            //监听服务端退出房间的返回消息
             socket.on('roomout', function (obj) {
                 that.$store.commit('setUsers', obj);
             });
             loading.show();
             setTimeout(async () => {
                 const data = {
-                    total: +this.getTotal,
-                    current: +this.current,
-                    roomid: this.roomid,
+                    total: +this.getTotal,//消息总数
+                    current: +this.current,//当前页，用于分页
+                    room_id: this.room_id,//房间id
                     api_token: this.auth_token
                 };
                 this.isloading = true;
+
+                //获取历史聊天记录
                 await this.$store.dispatch('getAllMessHistory', data);
                 this.isloading = false;
                 loading.hide();
@@ -187,13 +199,14 @@
                 });
             }, 500);
 
+            //滚动时获取聊天记录翻页
             this.container.addEventListener('scroll', debounce(async (e) => {
                 if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
                     this.$store.commit('setCurrent', +this.getCurrent + 1);
                     const data = {
                         total: +this.getTotal,
                         current: +this.getCurrent,
-                        roomid: this.roomid,
+                        room_id: this.room_id,
                         api_token: this.auth_token
                     };
                     this.isloading = true;
@@ -201,7 +214,7 @@
                     this.isloading = false;
                 }
             }, 50));
-
+            // Emoji 表情图标点击后的处理
             this.$refs.emoji.addEventListener('click', function (e) {
                 var target = e.target || e.srcElement;
                 if (!!target && target.tagName.toLowerCase() === 'span') {
@@ -238,7 +251,7 @@
             goback() {
                 const obj = {
                     name: this.userid,
-                    roomid: this.roomid,
+                    room_id: this.room_id,
                     api_token: this.auth_token,
                 };
                 socket.emit('roomout', obj);
@@ -256,7 +269,7 @@
                     const formdata = new window.FormData();
                     formdata.append('file', file1);
                     formdata.append('api_token', that.auth_token);
-                    formdata.append('roomid', that.roomid);
+                    formdata.append('room_id', that.room_id);
                     this.$store.dispatch('uploadImg', formdata);
                     const fr = new window.FileReader();
                     fr.onload = function () {
@@ -265,7 +278,7 @@
                             src: that.src,
                             img: fr.result,
                             msg: '',
-                            roomid: that.roomid,
+                            room_id: that.room_id,
                             time: new Date(),
                             api_token: that.auth_token
                         };
@@ -288,7 +301,7 @@
                 if (this.chatValue !== '') {
                     if (this.chatValue.length > 200) {
                         Alert({
-                            content: '请输入100字以内'
+                            content: '字数不能超过100'
                         });
                         return;
                     }
@@ -299,7 +312,7 @@
                         src: this.src,
                         img: '',
                         msg,
-                        roomid: this.roomid,
+                        room_id: this.room_id,
                         time: new Date(),
                         api_token: this.auth_token
                     };

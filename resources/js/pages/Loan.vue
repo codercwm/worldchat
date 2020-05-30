@@ -61,21 +61,16 @@
         },
         async mounted() {
             this.$store.commit("setTab", true);
-            alert(1)
             // 只全局监听一次
-            if (!this.isLogin) {
-                alert(2)
+            if (!this.isLogin) {//这个表示进行了登录操作才会触发
                 // 登录了,发送进入信息。
                 if (this.userid) {
-                    alert(3)
                     // 处理未读消息
                     socket.on("count", userCount => {
                         this.$store.commit("setUnread", userCount);
                         console.log(userCount);
                     });
-                    alert(4)
                     this.$store.commit("setLoginState", true);
-                    alert(5)
                 }
             }
         },

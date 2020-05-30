@@ -28,7 +28,7 @@ const store = new Vuex.Store({
         roomdetail: {
             id: '',
             users: {},
-            infos: [],
+            infos: [],//保存消息列表
             current: 1,
             total: 0
         },
@@ -97,8 +97,11 @@ const store = new Vuex.Store({
             state.roomdetail.infos.push(...data);
         },
         addRoomDefatilInfosHis(state, data) {
+            //state.roomdetail.infos是用来保存消息列表的
             const list = state.roomdetail.infos;
+            //这里把传入来的消息列表合并起来
             state.roomdetail.infos = data.concat(list);
+
         },
         setRoomDetailInfos(state) {
             state.roomdetail.infos = [];
@@ -162,10 +165,11 @@ const store = new Vuex.Store({
             commit
         }, data) {
             const res = await url.RoomHistoryAll(data);
-            if (res.data.data.errno === 0) {
-                commit('addRoomDefatilInfosHis', res.data.data.data);
+            if (res.data.errno === 0) {
+                //这里把list传入去，list是历史消息列表
+                commit('addRoomDefatilInfosHis', res.data.data.list);
                 if (!state.roomdetail.total) {
-                    commit('setTotal', res.data.data.total);
+                    commit('setTotal', res.data.data.message_total);
                 }
             }
         },

@@ -27,7 +27,7 @@ return [
         'handler' => \App\Services\WebSocket\WebSocketHandler::class,
         'parser' => \App\Services\WebSocket\SocketIO\SocketIOParser::class,
         'drivers' => [
-            'default' => 'table',
+            'default' => 'redis',//用table方式时出现了问题，详见TableRoom文件的第61行
             'table' => \App\Services\Websocket\Rooms\TableRoom::class,
             'redis' => \App\Services\Websocket\Rooms\RedisRoom::class,
             'settings' => [

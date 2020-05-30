@@ -37,6 +37,7 @@ const popNotice = function(msgInfo) {
     }
 };
 
+//监听后端emit过来的connect事件
 socket.on('connect', async () => {
     console.log('websocket 已连接: ' + socket.connected);
     const roomId = queryString(window.location.href, 'roomId');
@@ -52,20 +53,23 @@ socket.on('connect', async () => {
         const obj = {
             email: userId,
             src: store.state.userInfo.src,
-            roomid: roomId
+            roomid: roomId,
+            api_token: token
         };
         socket.emit('room', obj);
 
-        if (store.state.isDiscount) {
+        //这里干嘛要这样？不知道，先不要
+        /*if (store.state.isDiscount) {
             await store.commit('setRoomDetailInfos');
             await store.commit('setCurrent', 1);
             await store.commit('setDiscount', false);
             await store.commit('setTotal', 0);
             await store.dispatch('getAllMessHistory', {
                 current: 1,
-                roomid: roomId
+                roomid: roomId,
+                api_token: token
             });
-        }
+        }*/
     }
 });
 

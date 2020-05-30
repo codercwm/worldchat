@@ -2,6 +2,7 @@
 
 namespace App\Services\Websocket\Rooms;
 
+use App\Services\LogService;
 use Swoole\Table;
 
 class TableRoom implements RoomContract
@@ -57,6 +58,8 @@ class TableRoom implements RoomContract
 
         foreach ($roomNames as $room) {
             $fds = $this->getClients($room);
+            //这里坑了我很久，获取到的fds居然是空的，导致用户加入房间时，获取不到其它用户的fd，无法对其它用户进行通知
+            //LogService::write("room:{$room} 里面已经有的fds : ".json_encode($fds), 'room_in_out');
 
             if (in_array($fd, $fds)) {
                 continue;
@@ -130,7 +133,14 @@ class TableRoom implements RoomContract
      */
     protected function setClients(string $room, array $fds): TableRoom
     {
-        return $this->setValue($room, $fds, RoomContract::ROOMS_KEY);
+        $res = $this->setValue($room, $fds, RoomContract::ROOMS_KEY);
+        //这里明明是已经加入去了的，获取时却获取不到
+        /*LogService::write(
+            "把fds ".json_encode($fds)."加入到 {$room} ,
+            加入后room {$room} 有fds : ".
+            json_encode($this->getValue($room, RoomContract::ROOMS_KEY)),
+            'room_in_out');*/
+        return $res;
     }
 
     /**
@@ -141,6 +151,7 @@ class TableRoom implements RoomContract
      */
     protected function setRooms(int $fd, array $rooms): TableRoom
     {
+        //LogService::write("fd {$fd} 的rooms : ".json_encode($rooms), 'room_in_out');
         return $this->setValue($fd, $rooms, RoomContract::DESCRIPTORS_KEY);
     }
 

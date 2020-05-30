@@ -6,7 +6,7 @@ const Service = {
     // 注册接口
     RegisterUser: data => Axios.post('/register', data),
     // 获取当前房间所有历史聊天记录
-    RoomHistoryAll: data => Axios.get('/history/message', {
+    RoomHistoryAll: data => Axios.get('/message/history', {
         params: data
     }),
     // 机器人
@@ -27,7 +27,9 @@ const Service = {
     }),
 
     // 请求公告
-    getNotice: () => Axios.get('https://s3.qiufengh.com/config/notice-config.js')
+    getNotice: data => Axios.get('/notice', {
+        params: data
+    }),
 };
 
 export default Service;
