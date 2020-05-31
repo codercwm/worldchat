@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 class MessageResource extends JsonResource
 {
@@ -17,15 +18,13 @@ class MessageResource extends JsonResource
         //return parent::toArray($request);
         return [
             'id' => $this->id,
-            'userid' => $this->user->email,
-            'username' => $this->user->nickname,
-            'src' => $this->user->avatar,
+            'user_id' => $this->user->id,
+            'nickname' => $this->user->nickname,
+            'avatar' => $this->user->avatar,
             'msg' => $this->msg,
             'img' => $this->img,
-            'roomid' => $this->room_id,
+            'room_id' => $this->room_id,
             'time' => $this->created_at,
-            'avatar' => $this->user->avatar,
-
         ];
     }
 }

@@ -1,11 +1,10 @@
 <template>
     <div class="clear" :class="[isSelf ? 'right' : 'left']" ref="msg">
         <div class="item">
-            <div class="name">
-                <span v-if="mytime">{{getdate}}</span> &nbsp;&nbsp;{{name}}
-            </div>
+            <div class="nickname">{{nickname}}</div>
+            <div class="msg_time">{{getdate}}</div>
             <span class="head-place">
-                <img :src="headimg" alt="" class="head">
+                <img :src="avatar" alt="" class="head">
             </span>
             <div v-if="img">
                 <img
@@ -28,7 +27,7 @@
 import dateFormat from "../../utils/date";
 import { inHTMLData, uriInUnQuotedAttr } from "xss-filters-es6";
 export default {
-  props: ["name", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
+  props: ["nickname", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
   computed: {
     getdate() {
       return dateFormat(new Date(this.mytime), "yyyy-MM-dd HH:mm:ss");
@@ -46,16 +45,6 @@ export default {
         }
       );
     },
-    headimg() {
-        return '';
-      /*let headimg = this.avatar;
-      const reg = /\.\/static\/img\/(\d+)\.jpg/;
-      const matches = this.avatar.match(reg);
-      if (matches) {
-        headimg = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
-      }
-      return `${headimg}?imageView2/2/w/120/h/120`;*/
-    },
     pic() {
       let pic = this.img;
       if (pic.indexOf("data:image") > -1) {
@@ -65,7 +54,10 @@ export default {
     }
   },
   mounted() {
-    this.$refs.msg.scrollIntoView();
+      //渲染完列表后滚动到最底部
+      //其实这个不需在这里使用，因为获取分页时是上拉获取，获取完仍然要停留在最顶部
+      //所以把它注释掉
+     this.$refs.msg.scrollIntoView();
   }
 };
 </script>

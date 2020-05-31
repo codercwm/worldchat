@@ -288,7 +288,7 @@ class WebSocket
     {
         //把$this->to中不是整数的元素去掉
         //$fds = $this->to中所有的整数元素
-        //所以roomid是不能够已整数的形式存在的，否则会被认为是fd
+        //所以room_id是不能够已整数的形式存在的，否则会被认为是fd
         $fds = array_filter($this->to, function ($value) {
             return is_integer($value);
         });

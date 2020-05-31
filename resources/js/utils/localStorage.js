@@ -1,4 +1,4 @@
-const KEY = 'webchat_app';
+const KEY = 'worldchat_app';
 const localStorage = window.localStorage;
 let storeStorage;
 

@@ -33,13 +33,13 @@ WebsocketProxy::on('login', function (WebSocket $websocket, $data) {
         //获取未读消息
         $res = \App\Models\Count::where('user_id', $user->id)->whereIn('room_id', \App\Models\Count::$ROOMLIST)->get();
         $rooms = [];
-        foreach (\App\Models\Count::$ROOMLIST as $roomid) {
-            $result = $res->where('room_id', $roomid)->first();
-            $roomid = 'room' . $roomid;
+        foreach (\App\Models\Count::$ROOMLIST as $room_id) {
+            $result = $res->where('room_id', $room_id)->first();
+            $room_id = 'room' . $room_id;
             if ($result) {
-                $rooms[$roomid] = $result->count;
+                $rooms[$room_id] = $result->count;
             } else {
-                $rooms[$roomid] = 0;
+                $rooms[$room_id] = 0;
             }
         }
         $websocket->toUser($user)->emit('count', $rooms);
@@ -89,7 +89,7 @@ WebsocketProxy::on('room', function (WebSocket $websocket, $data) {
         //广播消息 给房间内所有用户
         //这个to设置room_id是什么原理？
         //to是设置发送放，如果传入int就会被识别为用户的fd进行发送
-        //如果传入的是str，就会被识别为roomid，然后它会用roomid获取出这个房间的所有fd进行发送
+        //如果传入的是str，就会被识别为room_id，然后它会用room_id获取出这个房间的所有fd进行发送
         $websocket->to($room)->emit('room', $online_users);
 
     } else {
@@ -152,12 +152,12 @@ WebsocketProxy::on('message',function(WebSocket $websocket,$data){
         $room = Count::$ROOMLIST[$room_id];
 
         $message_data = [
-            'userid' => $user->email,
-            'username' => $user->name,
-            'src' => $user->avatar,
+            'user_id' => $user->id,
+            'nickname' => $user->nickname,
+            'avatar' => $user->avatar,
             'msg' => $msg,
             'img' => '',
-            'roomid' => $room_id,
+            'room_id' => $room_id,
             'time' => $time
         ];
         $websocket->to($room)->emit('message',$message_data);

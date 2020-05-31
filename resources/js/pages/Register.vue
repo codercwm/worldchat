@@ -36,9 +36,7 @@ export default {
     async submit() {
       const email = this.email.trim();
       const password = this.password.trim();
-      const avatar = `//s3.qiufengh.com/avatar/${Math.ceil(
-        Math.random() * 272
-      )}.jpeg`;
+      const avatar = '';
       if (email !== "" && password !== "") {
         const data = {
             email: email,
@@ -53,20 +51,25 @@ export default {
             background: "#2196f3"
           });
           this.$store.commit("setUserInfo", {
-            type: "userid",
-            value: res.data.data.email
+            type: "user_id",
+            value: res.data.data.id
           });
+            this.$store.commit("setUserInfo", {
+                type: "nickname",
+                value: res.data.data.nickname
+            });
           this.$store.commit("setUserInfo", {
-            type: "token",
+            type: "api_token",
             value: res.data.data.api_token
           });
           this.$store.commit("setUserInfo", {
-            type: "src",
+            type: "avatar",
             value: res.data.data.avatar
           });
           this.getSvgModal.$root.$options.clear();
           this.$store.commit("setSvgModal", null);
           this.$router.push({ path: "/" });
+          //console.log(name)//name是<empty string>
           socket.emit("login", { name });
         } else {
           await Alert({
@@ -153,7 +156,7 @@ export default {
   right: 0;
   top: 0;
   bottom: 0;
-  background-image: url('//s3.qiufengh.com/webchat/bg.jpg');
+  background-image: url('//worldchat.test/img/bg.jpg');
   background-size: 100% 100%;
   background-position: center center;
 

@@ -17,7 +17,6 @@ class MessageController extends ApiBaseController
         $params = $request->only(['room_id','current','total']);
         $room_id = intval($params['room_id']);
         $current = intval($params['current']);
-        $total = intval($params['total']);
 
         //获取消息总数
         $message_total = Message::where('room_id',$room_id)->count();
@@ -25,11 +24,12 @@ class MessageController extends ApiBaseController
         $skip = ($current - 1) * $limit;
 
         //分页查询
-        $message_data = Message::where('room_id',$room_id)->skip($skip)->take($limit)->orderBy('created_at')->get();
+        $message_data = Message::where('room_id',$room_id)->skip($skip)->take($limit)
+            ->orderByDesc('created_at')->get()->reverse();
 
         $res = [
             'list' => MessageResource::collection($message_data),
-            'total' => $total,
+            'total' => $message_total,
             'current' => $current,
         ];
 

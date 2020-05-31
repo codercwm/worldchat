@@ -37,7 +37,7 @@
     data() {
       return {
         option: {
-          img: getItem('src'),
+          img: getItem('avatar'),
           size: 1,
           info: true,
           outputType: 'png',
@@ -57,13 +57,13 @@
           let files = new window.File([data], this.name, {type: this.type});
           const formdata = new window.FormData();
           formdata.append('file', files);
-          formdata.append('api_token', this.auth_token);
+          formdata.append('api_token', this.api_token);
           const res = await this.$store.dispatch('uploadAvatar', formdata);
           loading.hide();
           if (res.errno === 0) {
             console.log(res.data.url);
             this.$store.commit('setUserInfo', {
-              type: 'src',
+              type: 'avatar',
               value: res.data.url
             });
             await Alert({
@@ -125,9 +125,9 @@
     },
     computed: {
       ...mapState({
-        userid: state => state.userInfo.userid,
-        src: state => state.userInfo.src,
-        auth_token: state => state.userInfo.token
+        user_id: state => state.userInfo.user_id,
+        avatar: state => state.userInfo.avatar,
+        api_token: state => state.userInfo.api_token
       })
     }
   };

@@ -1858,11 +1858,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["name", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
+  props: ["nickname", "img", "msg", "avatar", "mytime", "is-self", "container", "isNeedScroll", "firstNode"],
   computed: {
     getdate: function getdate() {
       return Object(_utils_date__WEBPACK_IMPORTED_MODULE_0__["default"])(new Date(this.mytime), "yyyy-MM-dd HH:mm:ss");
@@ -1875,16 +1874,6 @@ __webpack_require__.r(__webpack_exports__);
         return "<a style=\"color: #b374ff\" href=\"".concat(Object(xss_filters_es6__WEBPACK_IMPORTED_MODULE_1__["uriInUnQuotedAttr"])(url), "\" target=\"_blank\">").concat(Object(xss_filters_es6__WEBPACK_IMPORTED_MODULE_1__["uriInUnQuotedAttr"])(url), "</a>");
       });
     },
-    headimg: function headimg() {
-      return '';
-      /*let headimg = this.avatar;
-      const reg = /\.\/static\/img\/(\d+)\.jpg/;
-      const matches = this.avatar.match(reg);
-      if (matches) {
-        headimg = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
-      }
-      return `${headimg}?imageView2/2/w/120/h/120`;*/
-    },
     pic: function pic() {
       var pic = this.img;
 
@@ -1896,6 +1885,9 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
+    //渲染完列表后滚动到最底部
+    //其实这个不需在这里使用，因为获取分页时是上拉获取，获取完仍然要停留在最顶部
+    //所以把它注释掉
     this.$refs.msg.scrollIntoView();
   }
 });
@@ -2154,7 +2146,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       option: {
-        img: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_3__["getItem"])('src'),
+        img: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_3__["getItem"])('avatar'),
         size: 1,
         info: true,
         outputType: 'png',
@@ -2182,7 +2174,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                   formdata = new window.FormData();
                   formdata.append('file', files);
-                  formdata.append('api_token', _this.auth_token);
+                  formdata.append('api_token', _this.api_token);
                   _context.next = 6;
                   return _this.$store.dispatch('uploadAvatar', formdata);
 
@@ -2198,7 +2190,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(res.data.url);
 
                   _this.$store.commit('setUserInfo', {
-                    type: 'src',
+                    type: 'avatar',
                     value: res.data.url
                   });
 
@@ -2306,14 +2298,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])({
-    userid: function userid(state) {
-      return state.userInfo.userid;
+    user_id: function user_id(state) {
+      return state.userInfo.user_id;
     },
-    src: function src(state) {
-      return state.userInfo.src;
+    avatar: function avatar(state) {
+      return state.userInfo.avatar;
     },
-    auth_token: function auth_token(state) {
-      return state.userInfo.token;
+    api_token: function api_token(state) {
+      return state.userInfo.api_token;
     }
   }))
 });
@@ -2495,21 +2487,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var roomId, data, res;
+      var room_id, data, res;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              roomId = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_5__["queryString"])(window.location.href, 'roomId');
-              _this.room_id = roomId;
+              room_id = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_5__["queryString"])(window.location.href, 'room_id');
+              _this.room_id = room_id;
 
-              if (!roomId) {
+              if (!room_id) {
                 _this.$router.push({
                   path: '/'
                 });
               }
 
-              if (!_this.userid) {
+              if (!_this.user_id) {
                 // 防止未登录
                 _this.$router.push({
                   path: '/login'
@@ -2517,7 +2509,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               data = {
-                api_token: _this.auth_token
+                api_token: _this.api_token
               };
               _context.next = 7;
               return _api_server__WEBPACK_IMPORTED_MODULE_10__["default"].getNotice(data);
@@ -2565,10 +2557,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 7:
               obj = {
-                name: _this2.userid,
-                src: _this2.src,
+                user_id: _this2.user_id,
+                avatar: _this2.avatar,
                 room_id: _this2.room_id,
-                api_token: _this2.auth_token
+                api_token: _this2.api_token
               }; //对websocket服务器通道路由room发起请求
 
               _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('room', obj); //监听服务端进入房间的返回消息
@@ -2580,7 +2572,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('roomout', function (obj) {
                 that.$store.commit('setUsers', obj);
               });
-              _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].show();
+              _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].show(); //进入页面获取历史消息
+
               Object(timers__WEBPACK_IMPORTED_MODULE_11__["setTimeout"])( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
                 var data;
                 return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
@@ -2588,13 +2581,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     switch (_context2.prev = _context2.next) {
                       case 0:
                         data = {
-                          total: +_this2.getTotal,
-                          //消息总数
                           current: +_this2.current,
                           //当前页，用于分页
                           room_id: _this2.room_id,
                           //房间id
-                          api_token: _this2.auth_token
+                          api_token: _this2.api_token
                         };
                         _this2.isloading = true; //获取历史聊天记录
 
@@ -2605,11 +2596,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                         _this2.isloading = false;
                         _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].hide();
 
-                        _this2.$nextTick(function () {
-                          _this2.container.scrollTop = 10000;
-                        });
-
-                      case 7:
+                      case 6:
                       case "end":
                         return _context2.stop();
                     }
@@ -2619,32 +2606,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this2.container.addEventListener('scroll', lodash_debounce__WEBPACK_IMPORTED_MODULE_9___default()( /*#__PURE__*/function () {
                 var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(e) {
-                  var data;
+                  var current_height1, data, current_height2;
                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
                     while (1) {
                       switch (_context3.prev = _context3.next) {
                         case 0:
+                          //获取当前的高度
+                          current_height1 = _this2.container.scrollHeight; //e.target.scrollTop表示动了多少
+
                           if (!(e.target.scrollTop >= 0 && e.target.scrollTop < 50)) {
-                            _context3.next = 7;
+                            _context3.next = 10;
                             break;
                           }
 
                           _this2.$store.commit('setCurrent', +_this2.getCurrent + 1);
 
                           data = {
-                            total: +_this2.getTotal,
                             current: +_this2.getCurrent,
                             room_id: _this2.room_id,
-                            api_token: _this2.auth_token
+                            api_token: _this2.api_token
                           };
                           _this2.isloading = true;
-                          _context3.next = 6;
+                          _context3.next = 7;
                           return _this2.$store.dispatch('getAllMessHistory', data);
 
-                        case 6:
-                          _this2.isloading = false;
-
                         case 7:
+                          _this2.isloading = false; //获取完数据后的新高度
+
+                          current_height2 = _this2.container.scrollHeight; //把页面滚动回刚才浏览到的位置
+
+                          _this2.container.scrollTop = current_height2 - current_height1 - 100;
+
+                        case 10:
                         case "end":
                           return _context3.stop();
                       }
@@ -2692,20 +2685,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     handleGithub: function handleGithub() {
       Object(_components_Alert__WEBPACK_IMPORTED_MODULE_8__["default"])({
-        content: 'https://github.com/nonfu/webchat'
+        content: 'https://github.com/codercwm/WorldChat'
       });
     },
     handleTips: function handleTips() {
       Object(_components_Alert__WEBPACK_IMPORTED_MODULE_8__["default"])({
         title: '请我喝杯咖啡',
-        html: '<div><img style="width: 200px" src="https://xueyuanjun.com/wp-content/uploads/2019/05/e7156cfe0196dd7d7ea4f8f5f10b8d1a.jpeg" /></div>'
+        html: '<div><img style="width: 200px" src="//worldchat.test/img/bg.jpg" /></div>'
       });
     },
     goback: function goback() {
       var obj = {
-        name: this.userid,
+        user_id: this.user_id,
         room_id: this.room_id,
-        api_token: this.auth_token
+        api_token: this.api_token
       };
       _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('roomout', obj);
       this.$router.goBack();
@@ -2715,36 +2708,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     setLog: function setLog() {// 版本更新日志
     },
     fileup: function fileup() {
-      var _this3 = this;
-
       var that = this;
       var file1 = document.getElementById('inputFile').files[0];
 
       if (file1) {
         var formdata = new window.FormData();
         formdata.append('file', file1);
-        formdata.append('api_token', that.auth_token);
+        formdata.append('api_token', that.api_token);
         formdata.append('room_id', that.room_id);
         this.$store.dispatch('uploadImg', formdata);
         var fr = new window.FileReader();
 
         fr.onload = function () {
           var obj = {
-            username: that.userid,
-            src: that.src,
+            user_id: that.user_id,
+            avatar: that.avatar,
             img: fr.result,
             msg: '',
             room_id: that.room_id,
             time: new Date(),
-            api_token: that.auth_token
+            api_token: that.api_token
           };
           _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('message', obj);
         };
 
         fr.readAsDataURL(file1);
-        this.$nextTick(function () {
-          _this3.container.scrollTop = 10000;
-        });
       } else {
         console.log('必须有文件');
       }
@@ -2766,13 +2754,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var msg = Object(xss_filters_es6__WEBPACK_IMPORTED_MODULE_2__["inHTMLData"])(this.chatValue); // 防止xss
 
         var obj = {
-          username: this.userid,
-          src: this.src,
+          user_id: this.user_id,
+          avatar: this.avatar,
           img: '',
           msg: msg,
           room_id: this.room_id,
           time: new Date(),
-          api_token: this.auth_token
+          api_token: this.api_token
         }; // 传递消息信息
 
         _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('message', obj);
@@ -2784,15 +2772,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapGetters"])(['getEmoji', 'getInfos', 'getUsers', 'getCurrent', 'getTotal'])), Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])(['isbind'])), Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])({
-    userid: function userid(state) {
-      return state.userInfo.userid;
+  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapGetters"])(['getEmoji', 'getInfos', 'getUsers', 'getCurrent'])), Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])(['isbind'])), Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])({
+    user_id: function user_id(state) {
+      return state.userInfo.user_id;
     },
-    src: function src(state) {
-      return state.userInfo.src;
+    avatar: function avatar(state) {
+      return state.userInfo.avatar;
     },
-    auth_token: function auth_token(state) {
-      return state.userInfo.token;
+    api_token: function api_token(state) {
+      return state.userInfo.api_token;
     }
   })),
   components: {
@@ -2897,7 +2885,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this.$store.commit("setTab", true);
 
-              if (_this.userid) {
+              if (_this.user_id) {
                 _context.next = 9;
                 break;
               }
@@ -2988,17 +2976,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_2__["clear"])();
 
                   _this2.$store.commit("setUserInfo", {
-                    type: "userid",
+                    type: "user_id",
                     value: ""
                   });
 
                   _this2.$store.commit("setUserInfo", {
-                    type: "token",
+                    type: "api_token",
                     value: ""
                   });
 
                   _this2.$store.commit("setUserInfo", {
-                    type: "src",
+                    type: "avatar",
                     value: ""
                   });
 
@@ -3033,11 +3021,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapState"])({
-    userid: function userid(state) {
-      return state.userInfo.userid;
+    user_id: function user_id(state) {
+      return state.userInfo.user_id;
     },
-    src: function src(state) {
-      return state.userInfo.src;
+    avatar: function avatar(state) {
+      return state.userInfo.avatar;
     }
   }))
 });
@@ -3144,7 +3132,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (!_this.isLogin) {
                 //这个表示进行了登录操作才会触发
                 // 登录了,发送进入信息。
-                if (_this.userid) {
+                if (_this.user_id) {
                   // 处理未读消息
                   _socket__WEBPACK_IMPORTED_MODULE_2__["default"].on("count", function (userCount) {
                     _this.$store.commit("setUnread", userCount);
@@ -3165,29 +3153,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    chatwindow: function chatwindow(roomID) {
+    chatwindow: function chatwindow(room_id) {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
-        var uerId, res;
+        var user_id, res;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                uerId = _this2.userid;
+                user_id = _this2.user_id;
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+                console.log(user_id);
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
 
-                if (uerId) {
-                  _context2.next = 7;
+                if (user_id) {
+                  _context2.next = 10;
                   break;
                 }
 
-                _context2.next = 4;
+                _context2.next = 7;
                 return Object(_components_Confirm__WEBPACK_IMPORTED_MODULE_1__["default"])({
                   title: "提示",
                   content: "聊天请先登录，但是你可以查看聊天记录哦~"
                 });
 
-              case 4:
+              case 7:
                 res = _context2.sent;
 
                 if (res === "submit") {
@@ -3198,17 +3189,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 return _context2.abrupt("return");
 
-              case 7:
+              case 10:
                 _this2.$store.commit("setTab", false);
 
                 _this2.$router.push({
                   path: "/chat",
                   query: {
-                    roomId: roomID
+                    room_id: room_id
                   }
                 });
 
-              case 9:
+              case 12:
               case "end":
                 return _context2.stop();
             }
@@ -3224,11 +3215,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_3__["mapState"])({
-    userid: function userid(state) {
-      return state.userInfo.userid;
+    user_id: function user_id(state) {
+      return state.userInfo.user_id;
     },
-    src: function src(state) {
-      return state.userInfo.src;
+    avatar: function avatar(state) {
+      return state.userInfo.avatar;
     },
     isLogin: function isLogin(state) {
       return state.isLogin;
@@ -3333,17 +3324,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
 
                   _this.$store.commit("setUserInfo", {
-                    type: "userid",
-                    value: res.data.data.email
+                    type: "user_id",
+                    value: res.data.data.id
                   });
 
                   _this.$store.commit("setUserInfo", {
-                    type: "token",
+                    type: "nickname",
+                    value: res.data.data.nickname
+                  });
+
+                  _this.$store.commit("setUserInfo", {
+                    type: "api_token",
                     value: res.data.data.api_token
                   });
 
                   _this.$store.commit("setUserInfo", {
-                    type: "src",
+                    type: "avatar",
                     value: res.data.data.avatar
                   });
 
@@ -3360,7 +3356,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 } else {
                   Object(_components_Alert__WEBPACK_IMPORTED_MODULE_2__["default"])({
-                    content: res.data.message
+                    content: res.data.msg
                   });
                 }
 
@@ -3480,10 +3476,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 email = _this.email.trim();
                 password = _this.password.trim();
-                avatar = "//s3.qiufengh.com/avatar/".concat(Math.ceil(Math.random() * 272), ".jpeg");
+                avatar = '';
 
                 if (!(email !== "" && password !== "")) {
-                  _context.next = 23;
+                  _context.next = 24;
                   break;
                 }
 
@@ -3499,7 +3495,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (!(res.status === "success")) {
-                  _context.next = 19;
+                  _context.next = 20;
                   break;
                 }
 
@@ -3510,17 +3506,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
 
                 _this.$store.commit("setUserInfo", {
-                  type: "userid",
-                  value: res.data.data.email
+                  type: "user_id",
+                  value: res.data.data.id
                 });
 
                 _this.$store.commit("setUserInfo", {
-                  type: "token",
+                  type: "nickname",
+                  value: res.data.data.nickname
+                });
+
+                _this.$store.commit("setUserInfo", {
+                  type: "api_token",
                   value: res.data.data.api_token
                 });
 
                 _this.$store.commit("setUserInfo", {
-                  type: "src",
+                  type: "avatar",
                   value: res.data.data.avatar
                 });
 
@@ -3530,30 +3531,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this.$router.push({
                   path: "/"
-                });
+                }); //console.log(name)//name是<empty string>
+
 
                 _socket__WEBPACK_IMPORTED_MODULE_6__["default"].emit("login", {
                   name: name
                 });
-                _context.next = 21;
+                _context.next = 22;
                 break;
 
-              case 19:
-                _context.next = 21;
+              case 20:
+                _context.next = 22;
                 return Object(_components_Alert__WEBPACK_IMPORTED_MODULE_3__["default"])({
                   content: res.data.msg
                 });
 
-              case 21:
-                _context.next = 24;
+              case 22:
+                _context.next = 25;
                 break;
 
-              case 23:
+              case 24:
                 Object(_components_Alert__WEBPACK_IMPORTED_MODULE_3__["default"])({
                   content: "邮箱或密码不能为空"
                 });
 
-              case 24:
+              case 25:
               case "end":
                 return _context.stop();
             }
@@ -3599,6 +3601,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Alert__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Alert */ "./resources/js/components/Alert/index.js");
 /* harmony import */ var _components_Message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Message */ "./resources/js/components/Message/index.vue");
 /* harmony import */ var _const_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../const/index */ "./resources/js/const/index.js");
+/* harmony import */ var _utils_date__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/date */ "./resources/js/utils/date.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -3645,13 +3648,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      hoster: _const_index__WEBPACK_IMPORTED_MODULE_3__["HOSTER_NAME"],
-      hosterImg: _const_index__WEBPACK_IMPORTED_MODULE_3__["HOSTER_URL"]
-    };
-  },
   mounted: function mounted() {// this.$store.commit('setTab', true);
   },
   methods: {
@@ -3669,33 +3667,62 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return;
       }
 
-      var id = this.userid;
-      var api_token = this.auth_token;
+      var user_id = this.user_id;
+      var api_token = this.api_token;
       var data = {
         info: info,
-        id: id,
+        user_id: user_id,
         api_token: api_token
       };
       this.$store.commit("setRobotMsg", {
         msg: info,
-        username: this.hoster,
-        src: this.hosterImg
+        nickname: this.hoster,
+        avatar: this.hosterImg,
+        time: Object(_utils_date__WEBPACK_IMPORTED_MODULE_4__["default"])(new Date(), "yyyy-MM-dd HH:mm:ss")
       });
       this.$store.dispatch("getRobatMess", data);
       document.getElementById("msg").value = "";
     }
   },
-  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])(["getRobotMsg"])), Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapState"])({
-    userid: function userid(state) {
-      return state.userInfo.userid;
+  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])(["getRobotMsg"])), Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapState"])({
+    user_id: function user_id(state) {
+      return state.userInfo.user_id;
     },
-    src: function src(state) {
-      return state.userInfo.src;
+    avatar: function avatar(state) {
+      return state.userInfo.avatar;
     },
-    auth_token: function auth_token(state) {
-      return state.userInfo.token;
+    api_token: function api_token(state) {
+      return state.userInfo.api_token;
+    },
+    nickname: function nickname(state) {
+      return state.userInfo.nickname;
     }
-  })),
+  })), {}, {
+    hoster: function hoster() {
+      //如果登录了就获取登录着名称，未登录就获取默认名称
+      console.log('this.nickname-------------------------------');
+      console.log(this.nickname);
+      console.log('this.nickname-------------------------------');
+
+      if (this.nickname) {
+        return this.nickname;
+      }
+
+      return _const_index__WEBPACK_IMPORTED_MODULE_3__["HOSTER_NAME"];
+    },
+    hosterImg: function hosterImg() {
+      //如果登录了就获取登录者头像，未登录就获取默认头像
+      console.log('this.avatar--------------------------');
+      console.log(this.avatar);
+      console.log('this.avatar--------------------------');
+
+      if (this.avatar) {
+        return this.avatar;
+      }
+
+      return _const_index__WEBPACK_IMPORTED_MODULE_3__["HOSTER_URL"];
+    }
+  }),
   components: {
     Message: _components_Message__WEBPACK_IMPORTED_MODULE_2__["default"]
   }
@@ -6298,7 +6325,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".login {\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background-image: url(\"//s3.qiufengh.com/webchat/bg.jpg\");\n  background-size: 100% 100%;\n  background-position: center center;\n}\n.login .mu-appbar {\n  text-align: center;\n}\n.login .mu-appbar .mu-flat-button-label {\n  font-size: 20px;\n}\n.login .content {\n  width: 80%;\n  margin: 70px auto 20px;\n}\n.login .content .mu-text-field {\n  width: 100%;\n}\n.login .content .mu-raised-button {\n  min-width: 80px;\n  display: block;\n  width: 100%;\n  margin: 0 auto;\n  transition: all 0.375s;\n}\n.login .content .mu-raised-button.loading {\n  width: 80px;\n  height: 80px;\n  border-radius: 50%;\n}\n", ""]);
+exports.push([module.i, ".login {\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background-image: url(\"//worldchat.test/img/bg.jpg\");\n  background-size: 100% 100%;\n  background-position: center center;\n}\n.login .mu-appbar {\n  text-align: center;\n}\n.login .mu-appbar .mu-flat-button-label {\n  font-size: 20px;\n}\n.login .content {\n  width: 80%;\n  margin: 70px auto 20px;\n}\n.login .content .mu-text-field {\n  width: 100%;\n}\n.login .content .mu-raised-button {\n  min-width: 80px;\n  display: block;\n  width: 100%;\n  margin: 0 auto;\n  transition: all 0.375s;\n}\n.login .content .mu-raised-button.loading {\n  width: 80px;\n  height: 80px;\n  border-radius: 50%;\n}\n", ""]);
 
 // exports
 
@@ -6317,7 +6344,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".btn-radius {\n  width: 100%;\n  height: 40px;\n  margin-top: 20px;\n  border: 1px solid rgba(255,255,255,0.38);\n  background: rgba(255,255,255,0.02);\n  color: #fff;\n  line-height: 40px;\n  text-align: center;\n  border-radius: 50px;\n}\n.header {\n  height: 50px;\n}\n.content .mu-text-field-input {\n  color: #fff;\n}\n.content .mu-text-field.has-label .mu-text-field-label.float {\n  color: rgba(255,255,255,0.38);\n}\n.content .mu-text-field-label {\n  color: #fff;\n}\n.content .mu-text-field-line {\n  background-color: rgba(255,255,255,0.38);\n}\n.content .mu-text-field-focus-line {\n  background-color: #fff;\n}\n.content .tip-user {\n  width: 100%;\n  text-align: center;\n  margin-top: 20px;\n  color: #fff;\n}\n.register {\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background-image: url(\"//s3.qiufengh.com/webchat/bg.jpg\");\n  background-size: 100% 100%;\n  background-position: center center;\n}\n.register .mu-appbar {\n  text-align: center;\n}\n.register .mu-appbar .mu-flat-button-label {\n  font-size: 20px;\n}\n.register .content {\n  width: 80%;\n  margin: 70px auto 20px;\n}\n.register .content .mu-text-field {\n  width: 100%;\n}\n", ""]);
+exports.push([module.i, ".btn-radius {\n  width: 100%;\n  height: 40px;\n  margin-top: 20px;\n  border: 1px solid rgba(255,255,255,0.38);\n  background: rgba(255,255,255,0.02);\n  color: #fff;\n  line-height: 40px;\n  text-align: center;\n  border-radius: 50px;\n}\n.header {\n  height: 50px;\n}\n.content .mu-text-field-input {\n  color: #fff;\n}\n.content .mu-text-field.has-label .mu-text-field-label.float {\n  color: rgba(255,255,255,0.38);\n}\n.content .mu-text-field-label {\n  color: #fff;\n}\n.content .mu-text-field-line {\n  background-color: rgba(255,255,255,0.38);\n}\n.content .mu-text-field-focus-line {\n  background-color: #fff;\n}\n.content .tip-user {\n  width: 100%;\n  text-align: center;\n  margin-top: 20px;\n  color: #fff;\n}\n.register {\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background-image: url(\"//worldchat.test/img/bg.jpg\");\n  background-size: 100% 100%;\n  background-position: center center;\n}\n.register .mu-appbar {\n  text-align: center;\n}\n.register .mu-appbar .mu-flat-button-label {\n  font-size: 20px;\n}\n.register .content {\n  width: 80%;\n  margin: 70px auto 20px;\n}\n.register .content .mu-text-field {\n  width: 100%;\n}\n", ""]);
 
 // exports
 
@@ -6336,7 +6363,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".container[data-v-91d0249e] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n}\n.container .title[data-v-91d0249e] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 1;\n}\n.container .title .center[data-v-91d0249e] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .chat-inner[data-v-91d0249e] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 56px;\n  bottom: 80px;\n}\n.container .con-input[data-v-91d0249e] {\n  width: 100%;\n  position: fixed;\n  height: 50px;\n  bottom: 0px;\n  display: flex;\n}\n.container .con-input .input[data-v-91d0249e] {\n  flex: 1;\n  background: #ddd;\n  padding: 4px;\n}\n.container .con-input .input input[data-v-91d0249e] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #ddd;\n  color: #333;\n  font-size: 18px;\n  padding-left: 5px;\n}\n.container .con-input .input .mu-text-field[data-v-91d0249e] {\n  width: 100%;\n}\n.container .con-input .demo-raised-button[data-v-91d0249e] {\n  height: 50px;\n}\n", ""]);
+exports.push([module.i, ".container[data-v-91d0249e] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n  margin-left: 0 !important;\n  margin-right: 0 !important;\n  padding-left: 0 !important;\n  padding-right: 0 !important;\n  max-width: none !important;\n}\n.container .title[data-v-91d0249e] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 1;\n}\n.container .title .center[data-v-91d0249e] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .chat-inner[data-v-91d0249e] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 80px;\n  bottom: 80px;\n}\n.container .con-input[data-v-91d0249e] {\n  width: 100%;\n  position: fixed;\n  height: 50px;\n  bottom: 0px;\n  display: flex;\n}\n.container .con-input .input[data-v-91d0249e] {\n  flex: 1;\n  background: #ddd;\n  padding: 4px;\n}\n.container .con-input .input input[data-v-91d0249e] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #ddd;\n  color: #333;\n  font-size: 18px;\n  padding-left: 5px;\n}\n.container .con-input .input .mu-text-field[data-v-91d0249e] {\n  width: 100%;\n}\n.container .con-input .demo-raised-button[data-v-91d0249e] {\n  height: 50px;\n}\n", ""]);
 
 // exports
 
@@ -6355,7 +6382,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".clear .item[data-v-091f9922] {\n  max-width: 100%;\n  position: relative;\n  clear: both;\n  display: inline-block;\n  padding: 16px 40px 16px 20px;\n  margin: 20px 10px 20px 10px;\n  border-radius: 10px;\n  background-color: #fff;\n}\n.clear .item .img[data-v-091f9922] {\n  max-width: 200px;\n}\n.clear .item .name[data-v-091f9922] {\n  position: absolute;\n  top: -20px;\n  width: 280px;\n  height: 20px;\n  overflow: hidden;\n  -ms-text-overflow: ellipsis;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.clear .item .msg[data-v-091f9922] {\n  word-break: break-all;\n}\n.clear .item .time[data-v-091f9922] {\n  position: absolute;\n  top: -40px;\n  width: 200px;\n  height: 20px;\n  right: -70px;\n}\n.clear .item .head-place[data-v-091f9922] {\n  display: block;\n  width: 50px;\n  height: 50px;\n  position: absolute;\n  top: 0;\n  background: #fff;\n  border-radius: 50px;\n  overflow: hidden;\n}\n.clear .item .head[data-v-091f9922] {\n  width: 50px;\n  height: 50px;\n  border-radius: 50px;\n}\n.clear .item[data-v-091f9922]:after {\n  position: absolute;\n  top: 15px;\n  content: '';\n  width: 0;\n  height: 0;\n}\n.left .item[data-v-091f9922] {\n  float: left;\n  margin-left: 80px;\n  color: #313035;\n}\n.left .item[data-v-091f9922]:after {\n  left: -15px;\n  border-top: 15px solid #fff;\n  border-left: 15px solid transparent;\n}\n.left .name[data-v-091f9922] {\n  text-align: left;\n  left: -70px;\n}\n.left .time[data-v-091f9922] {\n  text-align: left;\n}\n.left .head-place[data-v-091f9922] {\n  left: -70px;\n}\n.right .item[data-v-091f9922] {\n  float: right;\n  margin-right: 80px;\n  color: #fff;\n  background: #2196f3;\n}\n.right .item[data-v-091f9922]:after {\n  right: -15px;\n  border-top: 15px solid #2196f3;\n  border-right: 15px solid transparent;\n}\n.right .name[data-v-091f9922] {\n  color: #313035;\n  text-align: right;\n  right: -70px;\n}\n.right .time[data-v-091f9922] {\n  text-align: right;\n}\n.right .head-place[data-v-091f9922] {\n  right: -70px;\n}\n@-webkit-keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@-webkit-keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n@keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n", ""]);
+exports.push([module.i, ".clear .item[data-v-091f9922] {\n  max-width: 100%;\n  position: relative;\n  clear: both;\n  display: inline-block;\n  padding: 16px 40px 16px 20px;\n  margin: 20px 10px 20px 10px;\n  border-radius: 10px;\n  background-color: #fff;\n}\n.clear .item .img[data-v-091f9922] {\n  max-width: 200px;\n}\n.clear .item .nickname[data-v-091f9922] {\n  position: absolute;\n  top: 30px;\n  width: 65px;\n  height: 20px;\n  overflow: hidden;\n  -ms-text-overflow: ellipsis;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: 15px;\n  text-align: center;\n  color: #313035;\n}\n.clear .item .msg_time[data-v-091f9922] {\n  position: absolute;\n  top: -18px;\n  font-size: 12px;\n  width: 115px;\n  color: #aaa;\n}\n.clear .item .msg[data-v-091f9922] {\n  word-break: break-all;\n}\n.clear .item .time[data-v-091f9922] {\n  position: absolute;\n  top: -40px;\n  width: 200px;\n  height: 20px;\n  right: -70px;\n}\n.clear .item .head-place[data-v-091f9922] {\n  display: block;\n  width: 50px;\n  height: 50px;\n  position: absolute;\n  top: 0;\n  background: #fff;\n  border-radius: 50px;\n  overflow: hidden;\n  top: -20px;\n}\n.clear .item .head[data-v-091f9922] {\n  width: 50px;\n  height: 50px;\n  border-radius: 50px;\n}\n.clear .item[data-v-091f9922]:after {\n  position: absolute;\n  top: 15px;\n  content: '';\n  width: 0;\n  height: 0;\n}\n.left .msg_time[data-v-091f9922] {\n  left: -15px;\n  text-align: left;\n}\n.left .item[data-v-091f9922] {\n  float: left;\n  margin-left: 80px;\n  color: #313035;\n}\n.left .item[data-v-091f9922]:after {\n  left: -15px;\n  border-top: 15px solid #fff;\n  border-left: 15px solid transparent;\n}\n.left .nickname[data-v-091f9922] {\n  left: -80px;\n}\n.left .time[data-v-091f9922] {\n  text-align: left;\n}\n.left .head-place[data-v-091f9922] {\n  left: -70px;\n}\n.right .msg_time[data-v-091f9922] {\n  right: -15px;\n  text-align: right;\n}\n.right .item[data-v-091f9922] {\n  float: right;\n  margin-right: 80px;\n  color: #fff;\n  background: #2196f3;\n}\n.right .item[data-v-091f9922]:after {\n  right: -15px;\n  border-top: 15px solid #2196f3;\n  border-right: 15px solid transparent;\n}\n.right .nickname[data-v-091f9922] {\n  right: -80px;\n}\n.right .time[data-v-091f9922] {\n  text-align: right;\n}\n.right .head-place[data-v-091f9922] {\n  right: -70px;\n}\n@-webkit-keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@-webkit-keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n@keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n", ""]);
 
 // exports
 
@@ -6374,7 +6401,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".container[data-v-18c4d261] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n  -webkit-overflow-scrolling: touch;\n}\n.container .chat-inner[data-v-18c4d261] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 56px;\n  bottom: 80px;\n}\n.container .title[data-v-18c4d261] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 2;\n}\n.container .title .center[data-v-18c4d261] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .notice-hidden[data-v-18c4d261] {\n  transform: translate(0, -100%);\n}\n.container .notice[data-v-18c4d261] {\n  position: absolute;\n  top: 56px;\n  left: 0;\n  right: 0;\n  width: 94%;\n  z-index: 1;\n  margin: 0 auto;\n  background: #fff;\n  transition: transform 0.5s;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n}\n.container .notice .notice-li[data-v-18c4d261] {\n  padding: 2px 5px;\n}\n.container .notice .notice-li a[data-v-18c4d261] {\n  color: #6d6d6d;\n}\n.container .notice .notice-tool-bar[data-v-18c4d261] {\n  position: absolute;\n  width: 100px;\n  height: 30px;\n  bottom: -30px;\n  left: 50%;\n  transform: translate(-50%, 0);\n  background: #fff;\n  line-height: 30px;\n  text-align: center;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n  z-index: 1;\n}\n.container .chat-container[data-v-18c4d261] {\n  overflow: hidden;\n}\n.container .chat-container .chat-top[data-v-18c4d261] {\n  text-align: center;\n  margin: 5px 0 5px;\n  color: #d1cfd2;\n}\n.container .chat-container .chat-no-people[data-v-18c4d261] {\n  width: 100%;\n  height: 300px;\n  line-height: 300px;\n  text-align: center;\n  color: #d1cfd2;\n}\n.container .bottom[data-v-18c4d261] {\n  position: fixed;\n  width: 100%;\n  height: 80px;\n  bottom: 0;\n  left: 0;\n  z-index: 1;\n  border-top: 1px solid #ddd;\n  background: #f7f6fb;\n}\n.container .bottom .chat[data-v-18c4d261] {\n  width: 100%;\n  display: flex;\n}\n.container .bottom .chat .input[data-v-18c4d261] {\n  flex: 1;\n  padding: 0 4px 4px 4px;\n}\n.container .bottom .chat .input input[data-v-18c4d261] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #e8e7ea;\n  border-radius: 3px;\n  color: #333;\n  font-size: 19px;\n  padding-left: 5px;\n}\n.container .bottom .chat .input .mu-text-field[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .chat .demo-raised-button[data-v-18c4d261] {\n  margin-right: 8px;\n  min-width: 80px;\n  width: 80px;\n  height: 40px;\n  background: #eeeff3;\n  color: #8c8c96;\n}\n.container .bottom .functions[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .functions .fun-li[data-v-18c4d261] {\n  width: 40px;\n  height: 30px;\n  display: inline-block;\n  position: relative;\n  color: #828187;\n  text-align: center;\n}\n.container .bottom .functions .fun-li .iconfont[data-v-18c4d261] {\n  font-size: 20px;\n}\n.container .bottom .functions .emoji-content[data-v-18c4d261] {\n  position: absolute;\n  bottom: 30px;\n  left: -42px;\n  width: 375px;\n  height: 210px;\n  border-top: 1px solid #f3f3f3;\n  overflow: hidden;\n  background-color: #fff;\n}\n.container .bottom .functions .emoji-content .emoji-container[data-v-18c4d261] {\n  width: 10000px;\n}\n.container .bottom .functions .emoji-content .emoji-tabs[data-v-18c4d261] {\n  overflow: auto;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block[data-v-18c4d261] {\n  width: 1170px;\n  height: 200px;\n  float: left;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block span[data-v-18c4d261] {\n  display: inline-block;\n  cursor: pointer;\n  font-size: 26px;\n  min-width: 48px;\n  line-height: 39px;\n  text-align: center;\n  list-style: none;\n}\n.all-chat .online[data-v-18c4d261] {\n  display: inline-block;\n  margin: 5px;\n}\n.all-chat .online img[data-v-18c4d261] {\n  width: 40px;\n  height: 40px;\n  border-radius: 100%;\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n.chat-loading .lds-rolling[data-v-18c4d261] {\n  height: 40px;\n  overflow: hidden;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261],\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #2196f3;\n  border-top-color: transparent;\n  border-radius: 50%;\n  margin: 20px auto 0;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261] {\n  -webkit-animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n  animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  transform: rotate(90deg);\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n@keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n", ""]);
+exports.push([module.i, ".container[data-v-18c4d261] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n  -webkit-overflow-scrolling: touch;\n  margin-left: 0 !important;\n  margin-right: 0 !important;\n  padding-left: 0 !important;\n  padding-right: 0 !important;\n  max-width: none !important;\n}\n.container .chat-inner[data-v-18c4d261] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 80px;\n  bottom: 80px;\n}\n.container .title[data-v-18c4d261] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 2;\n}\n.container .title .center[data-v-18c4d261] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .notice-hidden[data-v-18c4d261] {\n  transform: translate(0, -100%);\n}\n.container .notice[data-v-18c4d261] {\n  position: absolute;\n  top: 56px;\n  left: 0;\n  right: 0;\n  width: 94%;\n  z-index: 1;\n  margin: 0 auto;\n  background: #fff;\n  transition: transform 0.5s;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n}\n.container .notice .notice-li[data-v-18c4d261] {\n  padding: 2px 5px;\n}\n.container .notice .notice-li a[data-v-18c4d261] {\n  color: #6d6d6d;\n}\n.container .notice .notice-tool-bar[data-v-18c4d261] {\n  position: absolute;\n  width: 100px;\n  height: 30px;\n  bottom: -30px;\n  left: 50%;\n  transform: translate(-50%, 0);\n  background: #fff;\n  line-height: 30px;\n  text-align: center;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n  z-index: 1;\n}\n.container .chat-container[data-v-18c4d261] {\n  overflow: hidden;\n}\n.container .chat-container .chat-top[data-v-18c4d261] {\n  text-align: center;\n  margin: 5px 0 5px;\n  color: #d1cfd2;\n}\n.container .chat-container .chat-no-people[data-v-18c4d261] {\n  width: 100%;\n  height: 300px;\n  line-height: 300px;\n  text-align: center;\n  color: #d1cfd2;\n}\n.container .bottom[data-v-18c4d261] {\n  position: fixed;\n  width: 100%;\n  height: 80px;\n  bottom: 0;\n  left: 0;\n  z-index: 1;\n  border-top: 1px solid #ddd;\n  background: #f7f6fb;\n}\n.container .bottom .chat[data-v-18c4d261] {\n  width: 100%;\n  display: flex;\n}\n.container .bottom .chat .input[data-v-18c4d261] {\n  flex: 1;\n  padding: 0 4px 4px 4px;\n}\n.container .bottom .chat .input input[data-v-18c4d261] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #e8e7ea;\n  border-radius: 3px;\n  color: #333;\n  font-size: 19px;\n  padding-left: 5px;\n}\n.container .bottom .chat .input .mu-text-field[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .chat .demo-raised-button[data-v-18c4d261] {\n  margin-right: 8px;\n  min-width: 80px;\n  width: 80px;\n  height: 40px;\n  background: #eeeff3;\n  color: #8c8c96;\n}\n.container .bottom .functions[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .functions .fun-li[data-v-18c4d261] {\n  width: 40px;\n  height: 30px;\n  display: inline-block;\n  position: relative;\n  color: #828187;\n  text-align: center;\n}\n.container .bottom .functions .fun-li .iconfont[data-v-18c4d261] {\n  font-size: 20px;\n}\n.container .bottom .functions .emoji-content[data-v-18c4d261] {\n  position: absolute;\n  bottom: 30px;\n  left: -42px;\n  width: 375px;\n  height: 210px;\n  border-top: 1px solid #f3f3f3;\n  overflow: hidden;\n  background-color: #fff;\n}\n.container .bottom .functions .emoji-content .emoji-container[data-v-18c4d261] {\n  width: 10000px;\n}\n.container .bottom .functions .emoji-content .emoji-tabs[data-v-18c4d261] {\n  overflow: auto;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block[data-v-18c4d261] {\n  width: 1170px;\n  height: 200px;\n  float: left;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block span[data-v-18c4d261] {\n  display: inline-block;\n  cursor: pointer;\n  font-size: 26px;\n  min-width: 48px;\n  line-height: 39px;\n  text-align: center;\n  list-style: none;\n}\n.all-chat .online[data-v-18c4d261] {\n  display: inline-block;\n  margin: 5px;\n}\n.all-chat .online img[data-v-18c4d261] {\n  width: 40px;\n  height: 40px;\n  border-radius: 100%;\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n.chat-loading .lds-rolling[data-v-18c4d261] {\n  height: 40px;\n  overflow: hidden;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261],\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #2196f3;\n  border-top-color: transparent;\n  border-radius: 50%;\n  margin: 20px auto 0;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261] {\n  -webkit-animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n  animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  transform: rotate(90deg);\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n@keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n", ""]);
 
 // exports
 
@@ -32472,15 +32499,14 @@ var render = function() {
     },
     [
       _c("div", { staticClass: "item" }, [
-        _c("div", { staticClass: "name" }, [
-          _vm.mytime ? _c("span", [_vm._v(_vm._s(_vm.getdate))]) : _vm._e(),
-          _vm._v("   " + _vm._s(_vm.name) + "\n        ")
-        ]),
+        _c("div", { staticClass: "nickname" }, [_vm._v(_vm._s(_vm.nickname))]),
+        _vm._v(" "),
+        _c("div", { staticClass: "msg_time" }, [_vm._v(_vm._s(_vm.getdate))]),
         _vm._v(" "),
         _c("span", { staticClass: "head-place" }, [
           _c("img", {
             staticClass: "head",
-            attrs: { src: _vm.headimg, alt: "" }
+            attrs: { src: _vm.avatar, alt: "" }
           })
         ]),
         _vm._v(" "),
@@ -32979,9 +33005,9 @@ var render = function() {
                 return _c("Message", {
                   key: obj._id,
                   attrs: {
-                    "is-self": obj.userid === _vm.userid,
-                    name: obj.username,
-                    head: obj.src,
+                    "is-self": obj.user_id === _vm.user_id,
+                    nickname: obj.nickname,
+                    avatar: obj.avatar,
                     msg: obj.msg,
                     img: obj.img,
                     mytime: obj.time,
@@ -33243,15 +33269,15 @@ var render = function() {
   return _c("div", [
     _c("div", { staticClass: "header" }, [
       _c("div", { staticClass: "head" }, [
-        _c("img", { attrs: { src: _vm.src, alt: "" } })
+        _c("img", { attrs: { src: _vm.avatar, alt: "" } })
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "name" }, [
-        _vm._v("\n            " + _vm._s(_vm.userid) + "\n        ")
+        _vm._v("\n            " + _vm._s(_vm.user_id) + "\n        ")
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "background" }, [
-        _c("img", { attrs: { src: _vm.src, alt: "" } })
+        _c("img", { attrs: { src: _vm.avatar, alt: "" } })
       ])
     ]),
     _vm._v(" "),
@@ -33486,9 +33512,7 @@ var render = function() {
                   1
                 ),
                 _vm._v(" "),
-                _c("mu-list-item-title", [
-                  _vm._v("客服大白(微信群，作者联系方式，找我)")
-                ]),
+                _c("mu-list-item-title", [_vm._v("机器人客服")]),
                 _vm._v(" "),
                 _c(
                   "mu-list-item-action",
@@ -33733,9 +33757,9 @@ var render = function() {
           [
             _c("Message", {
               attrs: {
-                "is-self": obj.username === _vm.hoster,
-                name: obj.username,
-                head: obj.src,
+                "is-self": obj.nickname === _vm.hoster,
+                nickname: obj.nickname,
+                avatar: obj.avatar,
                 msg: obj.msg,
                 img: obj.img,
                 mytime: obj.time
@@ -51398,7 +51422,7 @@ var popNotice = function popNotice(msgInfo) {
       content = msgInfo.msg;
     }
 
-    var notification = new Notification("\u3010".concat(msgInfo.roomid, "\u3011 \u63D0\u793A"), {
+    var notification = new Notification("\u3010".concat(msgInfo.room_id, "\u3011 \u63D0\u793A"), {
       body: content,
       icon: msgInfo.src
     });
@@ -51411,29 +51435,29 @@ var popNotice = function popNotice(msgInfo) {
 
 
 _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-  var roomId, userId, token, obj;
+  var room_id, userId, api_token, obj;
   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           console.log('websocket 已连接: ' + _socket__WEBPACK_IMPORTED_MODULE_5__["default"].connected);
-          roomId = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_6__["queryString"])(window.location.href, 'roomId');
-          userId = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.userid;
-          token = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.token;
+          room_id = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_6__["queryString"])(window.location.href, 'room_id');
+          userId = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.user_id;
+          api_token = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.api_token;
 
           if (userId) {
             _socket__WEBPACK_IMPORTED_MODULE_5__["default"].emit('login', {
               email: userId,
-              api_token: token
+              api_token: api_token
             });
           }
 
-          if (roomId) {
+          if (room_id) {
             obj = {
               email: userId,
-              src: _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.src,
-              roomid: roomId,
-              api_token: token
+              avatar: _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.userInfo.avatar,
+              room_id: room_id,
+              api_token: api_token
             };
             _socket__WEBPACK_IMPORTED_MODULE_5__["default"].emit('room', obj); //这里干嘛要这样？不知道，先不要
 
@@ -51444,8 +51468,8 @@ _socket__WEBPACK_IMPORTED_MODULE_5__["default"].on('connect', /*#__PURE__*/_asyn
                 await store.commit('setTotal', 0);
                 await store.dispatch('getAllMessHistory', {
                     current: 1,
-                    roomid: roomId,
-                    api_token: token
+                    room_id: room_id,
+                    api_token: api_token
                 });
             }*/
           }
@@ -52291,11 +52315,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOST_URL2", function() { return HOST_URL2; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOSTER_URL", function() { return HOSTER_URL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOSTER_NAME", function() { return HOSTER_NAME; });
-var ROBOT_URL = '//s3.qiufengh.com/avatar/robots.jpg';
+var ROBOT_URL = '//worldchat.test/img/robots.jpg';
 var ROBOT_NAME = '大白';
-var HOST_URL1 = '//s3.qiufengh.com/images/house.png?imageView2/2/w/120/h/120';
-var HOST_URL2 = '//s3.qiufengh.com/images/house2.png?imageView2/2/w/120/h/120';
-var HOSTER_URL = '//s3.qiufengh.com/avatar/hoster.jpg';
+var HOST_URL1 = '//worldchat.test/img/house.png';
+var HOST_URL2 = '//worldchat.test/img/house2.png';
+var HOSTER_URL = '//worldchat.test/img/hoster.jpg';
 var HOSTER_NAME = '主人';
 
 /***/ }),
@@ -53207,6 +53231,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_server__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/server */ "./resources/js/api/server.js");
 /* harmony import */ var _utils_localStorage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/localStorage */ "./resources/js/utils/localStorage.js");
 /* harmony import */ var _const__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../const */ "./resources/js/const/index.js");
+/* harmony import */ var _utils_date__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/date */ "./resources/js/utils/date.js");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -53233,13 +53258,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_2__["default"]);
 var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
   state: {
     userInfo: {
-      src: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('src'),
-      userid: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('userid'),
-      token: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('token')
+      avatar: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('avatar'),
+      user_id: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('user_id'),
+      api_token: Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('api_token')
     },
     isDiscount: false,
     isLogin: false,
@@ -53255,8 +53281,9 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
     // 存放机器人开场白
     robotmsg: [{
       username: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"],
-      src: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
-      msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。'
+      avatar: _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"],
+      msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。',
+      time: Object(_utils_date__WEBPACK_IMPORTED_MODULE_6__["default"])(new Date(), "yyyy-MM-dd HH:mm:ss")
     }],
     unRead: {
       room1: 0,
@@ -53503,14 +53530,14 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
     },
     getRobatMess: function getRobatMess(_ref6, data) {
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6() {
-        var commit, username, src, res, robotdata, msg;
+        var commit, nickname, avatar, res, robotdata, msg, time;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 commit = _ref6.commit;
-                username = _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"];
-                src = _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"];
+                nickname = _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_NAME"];
+                avatar = _const__WEBPACK_IMPORTED_MODULE_5__["ROBOT_URL"];
                 _context6.next = 5;
                 return _api_server__WEBPACK_IMPORTED_MODULE_3__["default"].getRobotMessage(data);
 
@@ -53529,11 +53556,12 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_2__["default"].Store({
                     msg = '暂不支持此类对话';
                   }
 
-                  msg = robotdata.text;
+                  time = Object(_utils_date__WEBPACK_IMPORTED_MODULE_6__["default"])(new Date(), "yyyy-MM-dd HH:mm:ss");
                   commit('setRobotMsg', {
                     msg: msg,
-                    username: username,
-                    src: src
+                    nickname: nickname,
+                    avatar: avatar,
+                    time: time
                   });
                 }
 
@@ -53691,7 +53719,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setItem", function() { return setItem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeItem", function() { return removeItem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clear", function() { return clear; });
-var KEY = 'webchat_app';
+var KEY = 'worldchat_app';
 var localStorage = window.localStorage;
 var storeStorage;
 

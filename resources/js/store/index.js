@@ -12,15 +12,16 @@ import {
     ROBOT_NAME,
     ROBOT_URL
 } from '../const';
+import dateFormat from "../utils/date";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
         userInfo: {
-            src: getItem('src'),
-            userid: getItem('userid'),
-            token: getItem('token')
+            avatar: getItem('avatar'),
+            user_id: getItem('user_id'),
+            api_token: getItem('api_token')
         },
         isDiscount: false,
         isLogin: false,
@@ -35,8 +36,9 @@ const store = new Vuex.Store({
         // 存放机器人开场白
         robotmsg: [{
                 username: ROBOT_NAME,
-                src: ROBOT_URL,
-                msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。'
+                avatar: ROBOT_URL,
+                msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。',
+                time:dateFormat(new Date(), "yyyy-MM-dd HH:mm:ss"),
             }
         ],
         unRead: {
@@ -176,8 +178,8 @@ const store = new Vuex.Store({
         async getRobatMess({
             commit
         }, data) {
-            const username = ROBOT_NAME;
-            const src = ROBOT_URL;
+            const nickname = ROBOT_NAME;
+            const avatar = ROBOT_URL;
             const res = await url.getRobotMessage(data);
 
             if (res) {
@@ -191,12 +193,13 @@ const store = new Vuex.Store({
                 } else {
                     msg = '暂不支持此类对话';
                 }
-                msg = robotdata.text;
+                let time = dateFormat(new Date(), "yyyy-MM-dd HH:mm:ss");
                 commit('setRobotMsg', {
                     msg,
-                    username,
-                    src
-                });
+                    nickname,
+                    avatar,
+                    time
+                })
             }
         }
     }

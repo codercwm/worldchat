@@ -17,7 +17,7 @@ class MessageRequest extends BaseRequest
                 return [
                     'room_id' => ['required','gt:0'],
                     'current' => ['required','gt:0'],
-                    'total' => ['required','gt:-1'],
+                    //'total' => ['required','gt:-1'],
                 ];
                 break;
         }

@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <!-- <div v-if="getInfos.length > 0" class="chat-top">到顶啦~</div> -->
-                    <Message v-for="obj in getInfos" :key="obj._id" :is-self="obj.userid === userid" :name="obj.username" :head="obj.src" :msg="obj.msg" :img="obj.img" :mytime="obj.time" :container="container"></Message>
+                    <Message v-for="obj in getInfos" :key="obj._id" :is-self="obj.user_id === user_id" :nickname="obj.nickname" :avatar="obj.avatar" :msg="obj.msg" :img="obj.img" :mytime="obj.time" :container="container"></Message>
                     <div class="clear"></div>
                 </div>
             </div>
@@ -133,17 +133,17 @@
             };
         },
         async created() {
-            const roomId = queryString(window.location.href, 'roomId');
-            this.room_id = roomId;
-            if (!roomId) {
+            const room_id = queryString(window.location.href, 'room_id');
+            this.room_id = room_id;
+            if (!room_id) {
                 this.$router.push({path: '/'});
             }
-            if (!this.userid) {
+            if (!this.user_id) {
                 // 防止未登录
                 this.$router.push({path: '/login'});
             }
             const data = {
-                api_token: this.auth_token
+                api_token: this.api_token
             };
             const res = await url.getNotice(data);
             // this.noticeList = [{"title":"欢迎您的到来，你可以自由发言"},{"href":"JavaScript:;"}];
@@ -165,10 +165,10 @@
             //初始化消息数量
             await this.$store.commit('setTotal', 0);
             const obj = {
-                name: this.userid,
-                src: this.src,
+                user_id: this.user_id,
+                avatar: this.avatar,
                 room_id: this.room_id,
-                api_token: this.auth_token
+                api_token: this.api_token
             };
             //对websocket服务器通道路由room发起请求
             socket.emit('room', obj);
@@ -181,12 +181,12 @@
                 that.$store.commit('setUsers', obj);
             });
             loading.show();
+            //进入页面获取历史消息
             setTimeout(async () => {
                 const data = {
-                    total: +this.getTotal,//消息总数
                     current: +this.current,//当前页，用于分页
                     room_id: this.room_id,//房间id
-                    api_token: this.auth_token
+                    api_token: this.api_token
                 };
                 this.isloading = true;
 
@@ -194,24 +194,31 @@
                 await this.$store.dispatch('getAllMessHistory', data);
                 this.isloading = false;
                 loading.hide();
-                this.$nextTick(() => {
-                    this.container.scrollTop = 10000;
-                });
+
             }, 500);
+
+
 
             //滚动时获取聊天记录翻页
             this.container.addEventListener('scroll', debounce(async (e) => {
+
+                //获取当前的高度
+                const current_height1 = this.container.scrollHeight;
+                //e.target.scrollTop表示动了多少
                 if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
                     this.$store.commit('setCurrent', +this.getCurrent + 1);
                     const data = {
-                        total: +this.getTotal,
                         current: +this.getCurrent,
                         room_id: this.room_id,
-                        api_token: this.auth_token
+                        api_token: this.api_token
                     };
                     this.isloading = true;
                     await this.$store.dispatch('getAllMessHistory', data);
                     this.isloading = false;
+                    //获取完数据后的新高度
+                    const current_height2 = this.container.scrollHeight;
+                    //把页面滚动回刚才浏览到的位置
+                    this.container.scrollTop = current_height2-current_height1-100;
                 }
             }, 50));
             // Emoji 表情图标点击后的处理
@@ -239,20 +246,20 @@
             },
             handleGithub() {
                 Alert({
-                    content: 'https://github.com/nonfu/webchat'
+                    content: 'https://github.com/codercwm/WorldChat'
                 });
             },
             handleTips() {
                 Alert({
                     title: '请我喝杯咖啡',
-                    html: '<div><img style="width: 200px" src="https://xueyuanjun.com/wp-content/uploads/2019/05/e7156cfe0196dd7d7ea4f8f5f10b8d1a.jpeg" /></div>'
+                    html: '<div><img style="width: 200px" src="//worldchat.test/img/bg.jpg" /></div>'
                 });
             },
             goback() {
                 const obj = {
-                    name: this.userid,
+                    user_id: this.user_id,
                     room_id: this.room_id,
-                    api_token: this.auth_token,
+                    api_token: this.api_token,
                 };
                 socket.emit('roomout', obj);
                 this.$router.goBack();
@@ -268,26 +275,23 @@
                 if (file1) {
                     const formdata = new window.FormData();
                     formdata.append('file', file1);
-                    formdata.append('api_token', that.auth_token);
+                    formdata.append('api_token', that.api_token);
                     formdata.append('room_id', that.room_id);
                     this.$store.dispatch('uploadImg', formdata);
                     const fr = new window.FileReader();
                     fr.onload = function () {
                         const obj = {
-                            username: that.userid,
-                            src: that.src,
+                            user_id: that.user_id,
+                            avatar: that.avatar,
                             img: fr.result,
                             msg: '',
                             room_id: that.room_id,
                             time: new Date(),
-                            api_token: that.auth_token
+                            api_token: that.api_token
                         };
                         socket.emit('message', obj);
                     };
                     fr.readAsDataURL(file1);
-                    this.$nextTick(() => {
-                        this.container.scrollTop = 10000;
-                    });
                 } else {
                     console.log('必须有文件');
                 }
@@ -308,13 +312,13 @@
                     const msg = inHTMLData(this.chatValue); // 防止xss
 
                     const obj = {
-                        username: this.userid,
-                        src: this.src,
+                        user_id: this.user_id,
+                        avatar: this.avatar,
                         img: '',
                         msg,
                         room_id: this.room_id,
                         time: new Date(),
-                        api_token: this.auth_token
+                        api_token: this.api_token
                     };
                     // 传递消息信息
                     socket.emit('message', obj);
@@ -331,16 +335,15 @@
                 'getEmoji',
                 'getInfos',
                 'getUsers',
-                'getCurrent',
-                'getTotal'
+                'getCurrent'
             ]),
             ...mapState([
                 'isbind'
             ]),
             ...mapState({
-                userid: state => state.userInfo.userid,
-                src: state => state.userInfo.src,
-                auth_token: state => state.userInfo.token,
+                user_id: state => state.userInfo.user_id,
+                avatar: state => state.userInfo.avatar,
+                api_token: state => state.userInfo.api_token,
             })
         },
         components: {

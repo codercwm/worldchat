@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\ApiBaseController;
 use App\Http\Requests\AuthRequest;
+use App\Services\ResService;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -30,17 +31,19 @@ class AuthController extends ApiBaseController
             'api_token' => Str::random(60)
         ]);
         if ($user) {
-            return [
+            return ResService::data($user)->msg('注册成功，谢谢')->success();
+            /*return [
                 'errno' => 0,
                 'msg' => '注册成功',
                 'data' =>  $user
-            ];
+            ];*/
         } else {
-            return [
+            return ResService::msg('保存用户到数据库失败')->fail();
+            /*return [
                 'errno' => 1,
                 'msg' => '保存用户到数据库失败',
                 'data' => []
-            ];
+            ];*/
         }
     }
 
@@ -52,35 +55,23 @@ class AuthController extends ApiBaseController
         if ($user && Hash::check($params['password'], $user->password)) {
             $user->api_token = Str::random(60);
             $user->save();
-            return [
-                'errno' => 0,
-                'msg' => '登录成功',
-                'data' => $user
-            ];
+            return ResService::data($user)->msg('登录成功')->success();
         }
+        return ResService::msg('用户名或密码不正确，请重新输入')->fail();
 
-        return [
-            'errno' => 1,
-            'msg' => '用户名或密码不正确，请重新输入',
-            'data' => []
-        ];
     }
 
     public function logout(Request $request)
     {
         $user = Auth::guard('auth:api')->user();
         if (!$user) {
-            return [
-                'errno' => 1,
-                'msg' => '用户已退出'
-            ];
+            return ResService::msg('用户已退出')->fail();
         }
         $userModel = User::find($user->id);
         $userModel->api_token = null;
         $userModel->save();
-        return [
-            'errno' => 0,
-            'msg' => '用户退出成功'
-        ];
+
+        return ResService::msg('退出成功')->success();
+
     }
 }

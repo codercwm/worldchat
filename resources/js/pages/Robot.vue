@@ -15,9 +15,9 @@
         <div class="chat-inner">
             <div v-for="(obj, index) in getRobotMsg" :key="index" class="">
                 <Message
-                    :is-self="obj.username === hoster"
-                    :name="obj.username"
-                    :head="obj.src"
+                    :is-self="obj.nickname === hoster"
+                    :nickname="obj.nickname"
+                    :avatar="obj.avatar"
                     :msg="obj.msg"
                     :img="obj.img"
                     :mytime="obj.time"
@@ -39,14 +39,9 @@
     import Alert from '../components/Alert';
     import Message from "../components/Message";
     import {HOSTER_URL, HOSTER_NAME} from "../const/index";
+    import dateFormat from "../utils/date";
 
     export default {
-        data() {
-            return {
-                hoster: HOSTER_NAME,
-                hosterImg: HOSTER_URL
-            };
-        },
         mounted() {
             // this.$store.commit('setTab', true);
         },
@@ -63,17 +58,19 @@
                     });
                     return;
                 }
-                const id = this.userid;
-                const api_token = this.auth_token;
+                const user_id = this.user_id;
+                const api_token = this.api_token;
                 const data = {
                     info,
-                    id,
+                    user_id,
                     api_token
                 };
+
                 this.$store.commit("setRobotMsg", {
                     msg: info,
-                    username: this.hoster,
-                    src: this.hosterImg
+                    nickname: this.hoster,
+                    avatar: this.hosterImg,
+                    time:dateFormat(new Date(), "yyyy-MM-dd HH:mm:ss"),
                 });
                 this.$store.dispatch("getRobatMess", data);
                 document.getElementById("msg").value = "";
@@ -82,10 +79,31 @@
         computed: {
             ...mapGetters(["getRobotMsg"]),
             ...mapState({
-                userid: state => state.userInfo.userid,
-                src: state => state.userInfo.src,
-                auth_token: state => state.userInfo.token,
-            })
+                user_id: state => state.userInfo.user_id,
+                avatar: state => state.userInfo.avatar,
+                api_token: state => state.userInfo.api_token,
+                nickname: state => state.userInfo.nickname,
+            }),
+            hoster() {
+                //如果登录了就获取登录着名称，未登录就获取默认名称
+                console.log('this.nickname-------------------------------')
+                console.log(this.nickname)
+                console.log('this.nickname-------------------------------')
+                if(this.nickname){
+                    return this.nickname;
+                }
+                return HOSTER_NAME;
+            },
+            hosterImg(){
+                //如果登录了就获取登录者头像，未登录就获取默认头像
+                console.log('this.avatar--------------------------')
+                console.log(this.avatar)
+                console.log('this.avatar--------------------------')
+                if(this.avatar){
+                    return this.avatar;
+                }
+                return HOSTER_URL;
+            },
         },
         components: {
             Message
@@ -99,6 +117,11 @@
         height: 100%;
         overflow: hidden;
         background: #f1f5f8;
+        margin-left : 0 !important;
+        margin-right : 0 !important;
+        padding-left : 0 !important;
+        padding-right : 0 !important;
+        max-width: none !important;
 
     .title {
         position: fixed;
@@ -130,7 +153,7 @@
         width: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
-        top: 56px;
+        top: 80px;
         bottom: 80px;
     }
 

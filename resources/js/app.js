@@ -27,7 +27,7 @@ const popNotice = function(msgInfo) {
         } else {
             content = msgInfo.msg;
         }
-        const notification = new Notification(`【${msgInfo.roomid}】 提示`, {
+        const notification = new Notification(`【${msgInfo.room_id}】 提示`, {
             body: content,
             icon: msgInfo.src
         });
@@ -40,21 +40,21 @@ const popNotice = function(msgInfo) {
 //监听后端emit过来的connect事件
 socket.on('connect', async () => {
     console.log('websocket 已连接: ' + socket.connected);
-    const roomId = queryString(window.location.href, 'roomId');
-    const userId = store.state.userInfo.userid;
-    const token = store.state.userInfo.token;
+    const room_id = queryString(window.location.href, 'room_id');
+    const userId = store.state.userInfo.user_id;
+    const api_token = store.state.userInfo.api_token;
     if (userId) {
         socket.emit('login', {
             email: userId,
-            api_token: token
+            api_token: api_token
         });
     }
-    if (roomId) {
+    if (room_id) {
         const obj = {
             email: userId,
-            src: store.state.userInfo.src,
-            roomid: roomId,
-            api_token: token
+            avatar: store.state.userInfo.avatar,
+            room_id: room_id,
+            api_token: api_token
         };
         socket.emit('room', obj);
 
@@ -66,8 +66,8 @@ socket.on('connect', async () => {
             await store.commit('setTotal', 0);
             await store.dispatch('getAllMessHistory', {
                 current: 1,
-                roomid: roomId,
-                api_token: token
+                room_id: room_id,
+                api_token: api_token
             });
         }*/
     }

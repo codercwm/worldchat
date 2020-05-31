@@ -2,13 +2,13 @@
     <div>
         <div class="header">
             <div class="head">
-                <img :src="src" alt="">
+                <img :src="avatar" alt="">
             </div>
             <div class="name">
-                {{userid}}
+                {{user_id}}
             </div>
             <div class="background">
-                <img :src="src" alt="">
+                <img :src="avatar" alt="">
             </div>
         </div>
         <div class="content">
@@ -59,7 +59,7 @@
         },
         async mounted() {
             this.$store.commit("setTab", true);
-            if (!this.userid) {
+            if (!this.user_id) {
                 const data = await Confirm({
                     title: "提示",
                     content: "需要登录后才能查看哦~",
@@ -95,15 +95,15 @@
                 if (data === "submit") {
                     clear();
                     this.$store.commit("setUserInfo", {
-                        type: "userid",
+                        type: "user_id",
                         value: ""
                     });
                     this.$store.commit("setUserInfo", {
-                        type: "token",
+                        type: "api_token",
                         value: ""
                     });
                     this.$store.commit("setUserInfo", {
-                        type: "src",
+                        type: "avatar",
                         value: ""
                     });
                     this.$store.commit("setUnread", {
@@ -131,8 +131,8 @@
         },
         computed: {
             ...mapState({
-                userid: state => state.userInfo.userid,
-                src: state => state.userInfo.src
+                user_id: state => state.userInfo.user_id,
+                avatar: state => state.userInfo.avatar
             })
         }
     };

@@ -35,7 +35,7 @@
                             <img :src="robot">
                         </mu-avatar>
                     </mu-list-item-action>
-                    <mu-list-item-title>客服大白(微信群，作者联系方式，找我)</mu-list-item-title>
+                    <mu-list-item-title>机器人客服</mu-list-item-title>
                     <mu-list-item-action>
                         <mu-icon value="chat_bubble"></mu-icon>
                     </mu-list-item-action>
@@ -64,7 +64,7 @@
             // 只全局监听一次
             if (!this.isLogin) {//这个表示进行了登录操作才会触发
                 // 登录了,发送进入信息。
-                if (this.userid) {
+                if (this.user_id) {
                     // 处理未读消息
                     socket.on("count", userCount => {
                         this.$store.commit("setUnread", userCount);
@@ -75,9 +75,12 @@
             }
         },
         methods: {
-            async chatwindow(roomID) {
-                const uerId = this.userid;
-                if (!uerId) {
+            async chatwindow(room_id) {
+                const user_id = this.user_id;
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+                console.log(user_id)
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+                if (!user_id) {
                     const res = await Confirm({
                         title: "提示",
                         content: "聊天请先登录，但是你可以查看聊天记录哦~"
@@ -88,7 +91,7 @@
                     return;
                 }
                 this.$store.commit("setTab", false);
-                this.$router.push({path: "/chat", query: {roomId: roomID}});
+                this.$router.push({path: "/chat", query: {room_id: room_id}});
             },
             chatRobot() {
                 this.$store.commit("setTab", false);
@@ -97,8 +100,8 @@
         },
         computed: {
             ...mapState({
-                userid: state => state.userInfo.userid,
-                src: state => state.userInfo.src,
+                user_id: state => state.userInfo.user_id,
+                avatar: state => state.userInfo.avatar,
                 isLogin: state => state.isLogin,
                 unRead1: state => state.unRead.room1,
                 unRead2: state => state.unRead.room2
@@ -112,25 +115,25 @@
     .avatar {
         position: relative;
 
-    .tip {
-        position: absolute;
-        right: -5px;
-        top: -8px;
-        padding: 0px 5px;
-        border-radius: 10px;
-        line-height: 20px;
-        text-align: center;
-        background: #ff2a2a;
-        color: #fff;
-        font-size: 12px;
-    }
+        .tip {
+            position: absolute;
+            right: -5px;
+            top: -8px;
+            padding: 0px 5px;
+            border-radius: 10px;
+            line-height: 20px;
+            text-align: center;
+            background: #ff2a2a;
+            color: #fff;
+            font-size: 12px;
+        }
 
-    .mu-avatar {
+        .mu-avatar {
 
-    img {
-        border-radius: 5px;
-    }
+            img {
+                border-radius: 5px;
+            }
 
-    }
+        }
     }
 </style>

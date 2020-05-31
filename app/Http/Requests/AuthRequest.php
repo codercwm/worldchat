@@ -18,7 +18,7 @@ class AuthRequest extends BaseRequest
                 return [
                     'email' => ['bail', 'required', 'string', 'email', 'max:100', 'unique:users'],
                     'password' => ['required', 'string', 'min:6'],
-                    'avatar' => ['bail','active_url','max:255']
+                    'avatar' => ['bail',/*'active_url',*/'max:255']
                 ];
                 break;
             case 'login':
