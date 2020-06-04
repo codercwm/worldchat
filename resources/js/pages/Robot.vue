@@ -86,9 +86,6 @@
             }),
             hoster() {
                 //如果登录了就获取登录着名称，未登录就获取默认名称
-                console.log('this.nickname-------------------------------')
-                console.log(this.nickname)
-                console.log('this.nickname-------------------------------')
                 if(this.nickname){
                     return this.nickname;
                 }
@@ -96,9 +93,6 @@
             },
             hosterImg(){
                 //如果登录了就获取登录者头像，未登录就获取默认头像
-                console.log('this.avatar--------------------------')
-                console.log(this.avatar)
-                console.log('this.avatar--------------------------')
                 if(this.avatar){
                     return this.avatar;
                 }

@@ -11,7 +11,7 @@
  Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 31/05/2020 21:57:02
+ Date: 04/06/2020 18:06:23
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,7 @@ CREATE TABLE `counts`  (
   `room_id` smallint(0) NOT NULL,
   `count` int(0) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of counts
@@ -37,8 +37,8 @@ INSERT INTO `counts` VALUES (2, 1, 2, 0);
 INSERT INTO `counts` VALUES (3, 1, 1, 1);
 INSERT INTO `counts` VALUES (4, 1, 1, 1);
 INSERT INTO `counts` VALUES (5, 1, 1, 1);
-INSERT INTO `counts` VALUES (6, 2, 1, 0);
-INSERT INTO `counts` VALUES (7, 3, 1, 20);
+INSERT INTO `counts` VALUES (6, 2, 1, 19);
+INSERT INTO `counts` VALUES (7, 3, 1, 10);
 INSERT INTO `counts` VALUES (8, 1, 2, 1);
 INSERT INTO `counts` VALUES (9, 1, 2, 1);
 
@@ -54,7 +54,7 @@ CREATE TABLE `failed_jobs`  (
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for messages
@@ -68,7 +68,7 @@ CREATE TABLE `messages`  (
   `room_id` smallint(0) NOT NULL COMMENT '房间id',
   `created_at` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 41 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 98 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of messages
@@ -150,6 +150,26 @@ INSERT INTO `messages` VALUES (74, '2', '', 1, 1, '2020-05-31 21:48:20');
 INSERT INTO `messages` VALUES (75, '4', '', 2, 1, '2020-05-31 21:49:48');
 INSERT INTO `messages` VALUES (76, '有人吗', '', 1, 2, '2020-05-31 21:52:29');
 INSERT INTO `messages` VALUES (77, '👕', '', 2, 1, '2020-05-31 21:54:51');
+INSERT INTO `messages` VALUES (78, '你们好', '', 3, 1, '2020-06-01 11:16:40');
+INSERT INTO `messages` VALUES (79, '你好', '', 1, 1, '2020-06-01 11:17:36');
+INSERT INTO `messages` VALUES (80, '', 'images/2020-06-01/859f8e90a3bd11eab0a0080027d0ed3e.jpeg', 1, 1, '2020-06-01 12:08:17');
+INSERT INTO `messages` VALUES (81, '', 'images/2020-06-01/b13e2906a3e711ea9421080027d0ed3e.jpeg', 1, 1, '2020-06-01 17:10:09');
+INSERT INTO `messages` VALUES (82, '', 'images/2020-06-01/86915290a3e811ea85ef080027d0ed3e.jpeg', 1, 1, '2020-06-01 17:16:07');
+INSERT INTO `messages` VALUES (83, '', 'images/2020-06-01/ac447b66a3e811eab661080027d0ed3e.jpeg', 1, 1, '2020-06-01 17:17:10');
+INSERT INTO `messages` VALUES (84, '', 'images/2020-06-01/5b576b4ea3ea11ea8a9c080027d0ed3e.jpeg', 1, 1, '2020-06-01 17:29:14');
+INSERT INTO `messages` VALUES (85, 'p', '', 1, 1, '2020-06-01 18:01:19');
+INSERT INTO `messages` VALUES (86, '', 'images/2020-06-01/dcf3f52ea3ee11ea8af1080027d0ed3e.jpeg', 1, 1, '2020-06-01 18:01:29');
+INSERT INTO `messages` VALUES (87, '', 'images/chats2020-06-02/17844702a4a811ea80d90800271186a7.jpeg', 1, 1, '2020-06-02 16:07:24');
+INSERT INTO `messages` VALUES (88, '', 'images/chats2020-06-02/9620e8e0a4a811eaa3d10800271186a7.jpeg', 1, 1, '2020-06-02 16:10:56');
+INSERT INTO `messages` VALUES (89, '343434', '', 1, 1, '2020-06-02 17:18:22');
+INSERT INTO `messages` VALUES (90, 'zaima', '', 1, 1, '2020-06-02 17:19:21');
+INSERT INTO `messages` VALUES (91, '33', '', 1, 1, '2020-06-02 17:54:02');
+INSERT INTO `messages` VALUES (92, 'y', '', 1, 1, '2020-06-02 17:54:26');
+INSERT INTO `messages` VALUES (93, 'gdsfgsdf', '', 1, 1, '2020-06-02 18:07:22');
+INSERT INTO `messages` VALUES (94, '你好', '', 1, 1, '2020-06-03 16:20:13');
+INSERT INTO `messages` VALUES (95, '你好', '', 1, 1, '2020-06-03 16:41:34');
+INSERT INTO `messages` VALUES (96, '12', '', 1, 1, '2020-06-03 18:01:19');
+INSERT INTO `messages` VALUES (97, '1', '', 1, 1, '2020-06-04 12:28:11');
 
 -- ----------------------------
 -- Table structure for migrations
@@ -208,9 +228,9 @@ CREATE TABLE `users`  (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, '测试1号', 'test1', 'test1@qq.com', NULL, '$2y$10$A3G7vjmBc3bERFryjZFcLe16hRxm5Yxoqxz2kIxkot81/nn0u3uVe', '//worldchat.test/img/house.png', NULL, 'LnahiW1Qz6KR6PMctyR15dLOhoghixmRqXiyMABXA5IDv3UsiEOBfeZWmlsA', '2020-05-25 13:28:24', '2020-05-31 21:30:04');
+INSERT INTO `users` VALUES (1, '测试1号', 'test1', 'test1@qq.com', NULL, '$2y$10$A3G7vjmBc3bERFryjZFcLe16hRxm5Yxoqxz2kIxkot81/nn0u3uVe', 'images/avatars/2020-06-02/7538b990a4a911ea96f90800271186a7.png', NULL, 'Soh7rsv5gkyrOJzPmc6yDqkvem4qJC81s3r8Ako0FpXBkPkfumLQipi9Eq86', '2020-05-25 13:28:24', '2020-06-03 17:40:29');
 INSERT INTO `users` VALUES (2, '测试2号', 'test2', 'test2@qq.com', NULL, '$2y$10$0tqHJWAYAl/QJ6l45gMeL.3Q.yvw8gwzpskIpVuHcUEg.LJzOk2Hm', '', NULL, '6eZsldIWPVuPPGRdj9bPk5toTAiK5FSbHqvY9UX7QdlI4s3LQvNOelp7Gjs5', '2020-05-25 21:32:19', '2020-05-31 15:55:06');
-INSERT INTO `users` VALUES (3, NULL, 'test3', 'test3@qq.com', NULL, '$2y$10$TIf.6kmCCusVV/1pSQyXaee5PGKMejoEw0WPMhE7Hf1.JRmDSfBWS', '', NULL, 'unkM4tSDj0LVUq8x0yStWmsW3qNpf9AXDS3z8efSvtvdLXzULSaG45amyEYc', '2020-05-27 10:42:34', '2020-05-31 21:25:33');
+INSERT INTO `users` VALUES (3, NULL, 'test3', 'test3@qq.com', NULL, '$2y$10$TIf.6kmCCusVV/1pSQyXaee5PGKMejoEw0WPMhE7Hf1.JRmDSfBWS', '', NULL, '84g2247gRd1sGAtzKUAzdT7cahO9XDsZ01O08p46cvT1vbD4aEhaoH5etkxw', '2020-05-27 10:42:34', '2020-06-01 11:16:28');
 INSERT INTO `users` VALUES (4, NULL, 'test5', 'test5@qq.com', NULL, '$2y$10$RXLm/co1YDuRgMjpfd9qAeBYthGql6W9Ybz8/271EHYdaKHyVQmVu', '', NULL, '7L2eBAOVMWn0MTlkP6BMmTCCVLOfMLLqVMeG0Z0xjwXhpWvakcmQHYJ3aIzC', '2020-05-27 10:49:49', '2020-05-27 10:49:49');
 INSERT INTO `users` VALUES (5, NULL, 'test6', 'test6@qq.com', NULL, '$2y$10$S0OSP..nITatZp3zIwno9.oMd/6CpN1UCZWsRVtyTRdfp48S9//M6', '', NULL, 'iZ7fub84T4gYtEVFM9Ku5KpXotx1JwzfvkOJYSyl5VEbljA83hSNb59WnQ5F', '2020-05-27 10:50:23', '2020-05-27 10:50:23');
 INSERT INTO `users` VALUES (6, NULL, 'test7', 'test7@qq.com', NULL, '$2y$10$RKRuATieTJUzue0XTcWDe.5AiXC0IPWPQK9ZgzoU.DmPVIQTvQJqG', '', NULL, 'yOKjvVoinzpHZmG3b6nCl1rFMnjlnaH45Ln88ZPxOWRjHhktwowZrdjPGS6o', '2020-05-27 10:55:20', '2020-05-27 10:55:20');

@@ -70,7 +70,7 @@ export default {
           this.$store.commit("setSvgModal", null);
           this.$router.push({ path: "/" });
           //console.log(name)//name是<empty string>
-          socket.emit("login", { name });
+          // socket.emit("login", { name });
         } else {
           await Alert({
             content: res.data.msg

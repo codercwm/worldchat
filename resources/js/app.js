@@ -41,17 +41,11 @@ const popNotice = function(msgInfo) {
 socket.on('connect', async () => {
     console.log('websocket 已连接: ' + socket.connected);
     const room_id = queryString(window.location.href, 'room_id');
-    const userId = store.state.userInfo.user_id;
+    const user_id = store.state.userInfo.user_id;
     const api_token = store.state.userInfo.api_token;
-    if (userId) {
-        socket.emit('login', {
-            email: userId,
-            api_token: api_token
-        });
-    }
     if (room_id) {
         const obj = {
-            email: userId,
+            email: user_id,
             avatar: store.state.userInfo.avatar,
             room_id: room_id,
             api_token: api_token

@@ -13,7 +13,7 @@ server {
     listen 80;
 
     server_name worldchat.test;
-    root /www/wwwroot/WorldChat/public;
+    root /www/wwwroot/worldchat/public;
 
     error_log /var/log/nginx/worldchat_error.log;
     access_log /var/log/nginx/worldchat_access.log;
@@ -35,7 +35,7 @@ server {
     # !!! The location of WebSocket is "/ws"
     # Javascript: var ws = new WebSocket("ws://worldchat.test/ws");
     # 处理 WebSocket 通信
-    location ^~ /ws/ {
+    location ^~ /socket.io {
         # proxy_connect_timeout 60s;
         # proxy_send_timeout 60s;
         # proxy_read_timeout: Nginx will close the connection if the proxied server does not send data to Nginx in 60 seconds; At the same time, this close behavior is also affected by heartbeat setting of Swoole.
@@ -73,4 +73,4 @@ server {
         proxy_pass http://worldchat;
     }
 }
-                                        
+

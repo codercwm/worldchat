@@ -15,3 +15,6 @@ linux环境下是不需要安装 cross-env的，把package.json文件里的cross
 npm run dev时报错
 emitting unnamed compat pluginError: EIO: i/o error, close
 把homestead的nfs关掉就可以了
+
+图片访问时404，执行php artisan storage:link
+执行php artisan storage:link时报错，用管理员打开ssh再执行

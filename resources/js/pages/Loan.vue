@@ -11,6 +11,7 @@
                     </mu-list-item-action>
                     <mu-list-item-title>聊天室1</mu-list-item-title>
                     <mu-list-item-action>
+                        <span class="unread">{{unRead1}}</span>
                         <mu-icon value="chat_bubble"></mu-icon>
                     </mu-list-item-action>
                 </mu-list-item>
@@ -22,6 +23,7 @@
                     </mu-list-item-action>
                     <mu-list-item-title>聊天室2</mu-list-item-title>
                     <mu-list-item-action>
+                        <span class="unread">{{unRead2}}</span>
                         <mu-icon value="chat_bubble"></mu-icon>
                     </mu-list-item-action>
                 </mu-list-item>
@@ -61,15 +63,11 @@
         },
         async mounted() {
             this.$store.commit("setTab", true);
+
             // 只全局监听一次
             if (!this.isLogin) {//这个表示进行了登录操作才会触发
                 // 登录了,发送进入信息。
                 if (this.user_id) {
-                    // 处理未读消息
-                    socket.on("count", userCount => {
-                        this.$store.commit("setUnread", userCount);
-                        console.log(userCount);
-                    });
                     this.$store.commit("setLoginState", true);
                 }
             }
@@ -77,9 +75,6 @@
         methods: {
             async chatwindow(room_id) {
                 const user_id = this.user_id;
-                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-                console.log(user_id)
-                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 if (!user_id) {
                     const res = await Confirm({
                         title: "提示",
@@ -102,9 +97,20 @@
             ...mapState({
                 user_id: state => state.userInfo.user_id,
                 avatar: state => state.userInfo.avatar,
+                api_token: state => state.userInfo.api_token,
                 isLogin: state => state.isLogin,
-                unRead1: state => state.unRead.room1,
-                unRead2: state => state.unRead.room2
+                unRead1: state =>{
+                    if(state.unRead.room1>0){
+                        return state.unRead.room1;
+                    }
+                    return '';
+                },
+                unRead2: state =>{
+                    if(state.unRead.room2>0){
+                        return state.unRead.room2;
+                    }
+                    return '';
+                }
             })
         }
     };
@@ -135,5 +141,14 @@
             }
 
         }
+    }
+    .unread{
+        position:absolute;
+        top:10px;
+        /*color:#eeeeee;*/
+        text-align: center;
+        width: 23px;
+        font-size: 10px;
+        color:darkred;
     }
 </style>

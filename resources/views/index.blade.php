@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//at.alicdn.com/t/font_500440_9oye91czwt8.css">
 
-    <title>Laravel学院在线聊天室</title>
+    <title>世界聊天室</title>
 
     <script type='text/javascript'>
         window.Laravel = <?php echo json_encode(['csrfToken' => csrf_token(),]); ?>

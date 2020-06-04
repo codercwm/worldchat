@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class MessageResource extends JsonResource
 {
@@ -20,9 +21,9 @@ class MessageResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user->id,
             'nickname' => $this->user->nickname,
-            'avatar' => $this->user->avatar,
+            'avatar' => asset_url($this->user->avatar),
             'msg' => $this->msg,
-            'img' => $this->img,
+            'img' => asset_url($this->img),
             'room_id' => $this->room_id,
             'time' => $this->created_at,
         ];

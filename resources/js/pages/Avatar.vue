@@ -61,7 +61,6 @@
           const res = await this.$store.dispatch('uploadAvatar', formdata);
           loading.hide();
           if (res.errno === 0) {
-            console.log(res.data.url);
             this.$store.commit('setUserInfo', {
               type: 'avatar',
               value: res.data.url

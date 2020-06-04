@@ -50,13 +50,11 @@ export default {
       if (pic.indexOf("data:image") > -1) {
         return pic;
       }
-      return `${pic}?imageView2/2/w/360`;
+      return `${pic}`;
     }
   },
   mounted() {
       //渲染完列表后滚动到最底部
-      //其实这个不需在这里使用，因为获取分页时是上拉获取，获取完仍然要停留在最顶部
-      //所以把它注释掉
      this.$refs.msg.scrollIntoView();
   }
 };

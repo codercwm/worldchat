@@ -66,7 +66,7 @@ export default {
           this.getSvgModal.$root.$options.clear();
           this.$store.commit("setSvgModal", null);
           this.$router.push({ path: "/" });
-          socket.emit("login", { name });
+          // socket.emit("login", { name });
         } else {
           Alert({
             content: res.data.msg

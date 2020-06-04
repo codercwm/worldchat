@@ -190,37 +190,36 @@
                 };
                 this.isloading = true;
 
-                //获取历史聊天记录
+                //进入页面首次获取历史聊天记录
                 await this.$store.dispatch('getAllMessHistory', data);
                 this.isloading = false;
                 loading.hide();
 
+                //滚动时获取聊天记录翻页
+                this.container.addEventListener('scroll', debounce(async (e) => {
+
+                    //获取当前的高度
+                    const current_height1 = this.container.scrollHeight;
+                    //e.target.scrollTop表示动了多少
+                    if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
+                        this.$store.commit('setCurrent', +this.getCurrent + 1);
+                        const data = {
+                            current: +this.getCurrent,
+                            room_id: this.room_id,
+                            api_token: this.api_token
+                        };
+                        this.isloading = true;
+                        await this.$store.dispatch('getAllMessHistory', data);
+                        this.isloading = false;
+                        //获取完数据后的新高度
+                        const current_height2 = this.container.scrollHeight;
+                        //把页面滚动回刚才浏览到的位置
+                        this.container.scrollTop = current_height2-current_height1-100;
+                    }
+                }, 50));
+
             }, 500);
 
-
-
-            //滚动时获取聊天记录翻页
-            this.container.addEventListener('scroll', debounce(async (e) => {
-
-                //获取当前的高度
-                const current_height1 = this.container.scrollHeight;
-                //e.target.scrollTop表示动了多少
-                if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
-                    this.$store.commit('setCurrent', +this.getCurrent + 1);
-                    const data = {
-                        current: +this.getCurrent,
-                        room_id: this.room_id,
-                        api_token: this.api_token
-                    };
-                    this.isloading = true;
-                    await this.$store.dispatch('getAllMessHistory', data);
-                    this.isloading = false;
-                    //获取完数据后的新高度
-                    const current_height2 = this.container.scrollHeight;
-                    //把页面滚动回刚才浏览到的位置
-                    this.container.scrollTop = current_height2-current_height1-100;
-                }
-            }, 50));
             // Emoji 表情图标点击后的处理
             this.$refs.emoji.addEventListener('click', function (e) {
                 var target = e.target || e.srcElement;

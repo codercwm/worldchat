@@ -14,7 +14,7 @@ const Service = {
         params: data
     }),
     // 上传图片
-    postUploadFile: data => Axios.post('/file/uploadimg', data, {
+    postUploadFile: data => Axios.post('/file/chatsimg', data, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }

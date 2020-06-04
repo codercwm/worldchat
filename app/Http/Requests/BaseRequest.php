@@ -30,7 +30,7 @@ class BaseRequest extends FormRequest
             break;
         }
         throw (new HttpResponseException(response()->json([
-            'code' => 400,
+            'errno' => 1,
             'msg'  => $message,
             'data' => []
         ])));

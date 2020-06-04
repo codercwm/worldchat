@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('index');
 });
+
+
+Route::get('/socket.io', 'SocketIOController@upgrade');
+Route::post('/socket.io', 'SocketIOController@ok');

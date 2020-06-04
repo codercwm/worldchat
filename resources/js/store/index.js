@@ -70,6 +70,7 @@ const store = new Vuex.Store({
         setCurrent(state, value) {
             state.roomdetail.current = value;
         },
+        //设置未读消息数
         setUnread(state, value) {
             for (let i in value) {
                 state.unRead[i] = +value[i];
