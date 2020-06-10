@@ -2460,14 +2460,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     var notice = Object(_utils_localStorage__WEBPACK_IMPORTED_MODULE_4__["getItem"])('notice') || {};
     var noticeBar = notice.noticeBar,
         noticeVersion = notice.noticeVersion;
     return {
-      isloading: false,
       room_id: '',
+      room_name: '聊天',
       container: {},
       chatValue: '',
       emoji: _utils_emoji__WEBPACK_IMPORTED_MODULE_3__["default"],
@@ -2488,6 +2489,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context.prev = _context.next) {
             case 0:
               room_id = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_5__["queryString"])(window.location.href, 'room_id');
+              _this.room_name = Object(_utils_queryString__WEBPACK_IMPORTED_MODULE_5__["queryStringZh"])(window.location.href, 'room_name');
               _this.room_id = room_id;
 
               if (!room_id) {
@@ -2506,10 +2508,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               data = {
                 api_token: _this.api_token
               };
-              _context.next = 7;
+              _context.next = 8;
               return _api_server__WEBPACK_IMPORTED_MODULE_10__["default"].getNotice(data);
 
-            case 7:
+            case 8:
               res = _context.sent;
               // this.noticeList = [{"title":"欢迎您的到来，你可以自由发言"},{"href":"JavaScript:;"}];
               _this.noticeList = res.data.noticeList;
@@ -2520,7 +2522,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.noticeVersion = res.data.version;
 
-            case 11:
+            case 12:
             case "end":
               return _context.stop();
           }
@@ -2532,63 +2534,60 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this2 = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
-      var that, obj;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              // 微信 回弹 bug
-              Object(_utils_ios__WEBPACK_IMPORTED_MODULE_12__["default"])();
-              _this2.container = document.querySelector('.chat-inner'); // socket内部，this指针指向问题
-
-              that = _this2; //初始化房间信息，这里时清空了房间信息
-
-              _context4.next = 5;
-              return _this2.$store.commit('setRoomDetailInfos');
-
-            case 5:
-              _context4.next = 7;
-              return _this2.$store.commit('setTotal', 0);
-
-            case 7:
-              obj = {
-                user_id: _this2.user_id,
-                avatar: _this2.avatar,
-                room_id: _this2.room_id,
-                api_token: _this2.api_token
-              }; //对websocket服务器通道路由room发起请求
-
-              _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('room', obj); //监听服务端进入房间的返回消息
-
-              _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('room', function (obj) {
-                that.$store.commit('setUsers', obj);
-              }); //监听服务端退出房间的返回消息
-
-              _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('roomout', function (obj) {
-                that.$store.commit('setUsers', obj);
-              });
               _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].show(); //进入页面获取历史消息
 
               Object(timers__WEBPACK_IMPORTED_MODULE_11__["setTimeout"])( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
-                var data;
+                var that, obj, data;
                 return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
                   while (1) {
                     switch (_context3.prev = _context3.next) {
                       case 0:
+                        // 微信 回弹 bug
+                        Object(_utils_ios__WEBPACK_IMPORTED_MODULE_12__["default"])();
+                        _this2.container = document.querySelector('.chat-inner'); // socket内部，this指针指向问题
+
+                        that = _this2; //初始化房间信息，这里时清空了房间信息
+
+                        _context3.next = 5;
+                        return _this2.$store.commit('setRoomDetailInfos');
+
+                      case 5:
+                        _context3.next = 7;
+                        return _this2.$store.commit('setTotal', 0);
+
+                      case 7:
+                        obj = {
+                          user_id: _this2.user_id,
+                          avatar: _this2.avatar,
+                          room_id: _this2.room_id,
+                          api_token: _this2.api_token
+                        }; //对websocket服务器通道路由room发起请求
+
+                        _socket__WEBPACK_IMPORTED_MODULE_13__["default"].emit('room', obj); //监听服务端进入房间的返回消息
+
+                        _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('room', function (obj) {
+                          that.$store.commit('setUsers', obj);
+                        }); //监听服务端退出房间的返回消息
+
+                        _socket__WEBPACK_IMPORTED_MODULE_13__["default"].on('roomout', function (obj) {
+                          that.$store.commit('setUsers', obj);
+                        });
                         data = {
                           current: +_this2.current,
                           //当前页，用于分页
                           room_id: _this2.room_id,
                           //房间id
                           api_token: _this2.api_token
-                        };
-                        _this2.isloading = true; //进入页面首次获取历史聊天记录
+                        }; //进入页面首次获取历史聊天记录
 
-                        _context3.next = 4;
+                        _context3.next = 14;
                         return _this2.$store.dispatch('getAllMessHistory', data);
 
-                      case 4:
-                        _this2.isloading = false;
+                      case 14:
                         _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].hide(); //滚动时获取聊天记录翻页
 
                         _this2.container.addEventListener('scroll', lodash_debounce__WEBPACK_IMPORTED_MODULE_9___default()( /*#__PURE__*/function () {
@@ -2614,12 +2613,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                                       room_id: _this2.room_id,
                                       api_token: _this2.api_token
                                     };
-                                    _this2.isloading = true;
+                                    _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].show();
                                     _context2.next = 7;
                                     return _this2.$store.dispatch('getAllMessHistory', _data);
 
                                   case 7:
-                                    _this2.isloading = false; //获取完数据后的新高度
+                                    _components_loading__WEBPACK_IMPORTED_MODULE_7__["default"].hide(); //获取完数据后的新高度
 
                                     current_height2 = _this2.container.scrollHeight; //把页面滚动回刚才浏览到的位置
 
@@ -2636,27 +2635,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                           return function (_x) {
                             return _ref2.apply(this, arguments);
                           };
-                        }(), 50));
+                        }(), 50)); // Emoji 表情图标点击后的处理
 
-                      case 7:
+
+                        _this2.$refs.emoji.addEventListener('click', function (e) {
+                          var target = e.target || e.srcElement;
+
+                          if (!!target && target.tagName.toLowerCase() === 'span') {
+                            that.chatValue = that.chatValue + target.innerHTML;
+                          }
+
+                          e.stopPropagation();
+                        });
+
+                      case 17:
                       case "end":
                         return _context3.stop();
                     }
                   }
                 }, _callee3);
-              })), 500); // Emoji 表情图标点击后的处理
+              })), 1000);
 
-              _this2.$refs.emoji.addEventListener('click', function (e) {
-                var target = e.target || e.srcElement;
-
-                if (!!target && target.tagName.toLowerCase() === 'span') {
-                  that.chatValue = that.chatValue + target.innerHTML;
-                }
-
-                e.stopPropagation();
-              });
-
-            case 14:
+            case 2:
             case "end":
               return _context4.stop();
           }
@@ -2680,7 +2680,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     handleGithub: function handleGithub() {
       Object(_components_Alert__WEBPACK_IMPORTED_MODULE_8__["default"])({
-        content: 'https://github.com/codercwm/WorldChat'
+        content: 'https://github.com/codercwm/worldchat'
       });
     },
     handleTips: function handleTips() {
@@ -3042,6 +3042,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _socket__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../socket */ "./resources/js/socket.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 /* harmony import */ var _const_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../const/index */ "./resources/js/const/index.js");
+/* harmony import */ var _api_server__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/server */ "./resources/js/api/server.js");
 
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -3103,6 +3104,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+
 
 
 
@@ -3112,17 +3115,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       house1: _const_index__WEBPACK_IMPORTED_MODULE_4__["HOST_URL1"],
       house2: _const_index__WEBPACK_IMPORTED_MODULE_4__["HOST_URL2"],
-      robot: _const_index__WEBPACK_IMPORTED_MODULE_4__["ROBOT_URL"]
+      robot: _const_index__WEBPACK_IMPORTED_MODULE_4__["ROBOT_URL"],
+      roomsList: []
     };
   },
   mounted: function mounted() {
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      var rooms_res;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              _context.next = 2;
+              return _api_server__WEBPACK_IMPORTED_MODULE_5__["default"].getRoomsList();
+
+            case 2:
+              rooms_res = _context.sent;
+
+              if (0 == rooms_res.data.errno) {
+                _this.roomsList = rooms_res.data.data;
+              }
+
               _this.$store.commit("setTab", true); // 只全局监听一次
 
 
@@ -3134,7 +3149,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
               }
 
-            case 2:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -3143,7 +3158,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    chatwindow: function chatwindow(room_id) {
+    chatwindow: function chatwindow(room_id, room_name) {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
@@ -3162,7 +3177,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context2.next = 4;
                 return Object(_components_Confirm__WEBPACK_IMPORTED_MODULE_1__["default"])({
                   title: "提示",
-                  content: "聊天请先登录，但是你可以查看聊天记录哦~"
+                  content: "你好，请先登录"
                 });
 
               case 4:
@@ -3182,7 +3197,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.$router.push({
                   path: "/chat",
                   query: {
-                    room_id: room_id
+                    room_id: room_id,
+                    room_name: room_name
                   }
                 });
 
@@ -3318,7 +3334,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   Object(_components_Toast__WEBPACK_IMPORTED_MODULE_3__["default"])({
                     content: res.data.msg,
                     timeout: 1000,
-                    background: "#2196f3"
+                    background: "#137055"
                   });
 
                   _this.$store.commit("setUserInfo", {
@@ -3347,8 +3363,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this.$router.push({
                     path: "/"
-                  }); // socket.emit("login", { name });
+                  });
 
+                  location.reload();
                 } else {
                   Object(_components_Alert__WEBPACK_IMPORTED_MODULE_2__["default"])({
                     content: res.data.msg
@@ -3445,7 +3462,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 
 
 
@@ -3474,7 +3490,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 avatar = '';
 
                 if (!(email !== "" && password !== "")) {
-                  _context.next = 23;
+                  _context.next = 24;
                   break;
                 }
 
@@ -3490,14 +3506,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (!(res.status === "success")) {
-                  _context.next = 19;
+                  _context.next = 20;
                   break;
                 }
 
                 Object(_components_Toast__WEBPACK_IMPORTED_MODULE_4__["default"])({
                   content: res.data.msg,
                   timeout: 1000,
-                  background: "#2196f3"
+                  background: "#137055"
                 });
 
                 _this.$store.commit("setUserInfo", {
@@ -3526,29 +3542,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this.$router.push({
                   path: "/"
-                }); //console.log(name)//name是<empty string>
-                // socket.emit("login", { name });
+                });
 
-
-                _context.next = 21;
+                location.reload();
+                _context.next = 22;
                 break;
 
-              case 19:
-                _context.next = 21;
+              case 20:
+                _context.next = 22;
                 return Object(_components_Alert__WEBPACK_IMPORTED_MODULE_3__["default"])({
                   content: res.data.msg
                 });
 
-              case 21:
-                _context.next = 24;
+              case 22:
+                _context.next = 25;
                 break;
 
-              case 23:
+              case 24:
                 Object(_components_Alert__WEBPACK_IMPORTED_MODULE_3__["default"])({
                   content: "邮箱或密码不能为空"
                 });
 
-              case 24:
+              case 25:
               case "end":
                 return _context.stop();
             }
@@ -6367,7 +6382,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".clear .item[data-v-091f9922] {\n  max-width: 100%;\n  position: relative;\n  clear: both;\n  display: inline-block;\n  padding: 16px 40px 16px 20px;\n  margin: 20px 10px 20px 10px;\n  border-radius: 10px;\n  background-color: #fff;\n}\n.clear .item .img[data-v-091f9922] {\n  max-width: 200px;\n}\n.clear .item .nickname[data-v-091f9922] {\n  position: absolute;\n  top: 30px;\n  width: 65px;\n  height: 20px;\n  overflow: hidden;\n  -ms-text-overflow: ellipsis;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: 15px;\n  text-align: center;\n  color: #313035;\n}\n.clear .item .msg_time[data-v-091f9922] {\n  position: absolute;\n  top: -18px;\n  font-size: 12px;\n  width: 115px;\n  color: #aaa;\n}\n.clear .item .msg[data-v-091f9922] {\n  word-break: break-all;\n}\n.clear .item .time[data-v-091f9922] {\n  position: absolute;\n  top: -40px;\n  width: 200px;\n  height: 20px;\n  right: -70px;\n}\n.clear .item .head-place[data-v-091f9922] {\n  display: block;\n  width: 50px;\n  height: 50px;\n  position: absolute;\n  top: 0;\n  background: #fff;\n  border-radius: 50px;\n  overflow: hidden;\n  top: -20px;\n}\n.clear .item .head[data-v-091f9922] {\n  width: 50px;\n  height: 50px;\n  border-radius: 50px;\n}\n.clear .item[data-v-091f9922]:after {\n  position: absolute;\n  top: 15px;\n  content: '';\n  width: 0;\n  height: 0;\n}\n.left .msg_time[data-v-091f9922] {\n  left: -15px;\n  text-align: left;\n}\n.left .item[data-v-091f9922] {\n  float: left;\n  margin-left: 80px;\n  color: #313035;\n}\n.left .item[data-v-091f9922]:after {\n  left: -15px;\n  border-top: 15px solid #fff;\n  border-left: 15px solid transparent;\n}\n.left .nickname[data-v-091f9922] {\n  left: -80px;\n}\n.left .time[data-v-091f9922] {\n  text-align: left;\n}\n.left .head-place[data-v-091f9922] {\n  left: -70px;\n}\n.right .msg_time[data-v-091f9922] {\n  right: -15px;\n  text-align: right;\n}\n.right .item[data-v-091f9922] {\n  float: right;\n  margin-right: 80px;\n  color: #fff;\n  background: #2196f3;\n}\n.right .item[data-v-091f9922]:after {\n  right: -15px;\n  border-top: 15px solid #2196f3;\n  border-right: 15px solid transparent;\n}\n.right .nickname[data-v-091f9922] {\n  right: -80px;\n}\n.right .time[data-v-091f9922] {\n  text-align: right;\n}\n.right .head-place[data-v-091f9922] {\n  right: -70px;\n}\n@-webkit-keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@-webkit-keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n@keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n", ""]);
+exports.push([module.i, ".clear .item[data-v-091f9922] {\n  max-width: 100%;\n  position: relative;\n  clear: both;\n  display: inline-block;\n  padding: 16px 40px 16px 20px;\n  margin: 20px 10px 20px 10px;\n  border-radius: 10px;\n  background-color: #fff;\n}\n.clear .item .img[data-v-091f9922] {\n  max-width: 200px;\n}\n.clear .item .nickname[data-v-091f9922] {\n  position: absolute;\n  top: 30px;\n  width: 65px;\n  height: 20px;\n  overflow: hidden;\n  -ms-text-overflow: ellipsis;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: 15px;\n  text-align: center;\n  color: #313035;\n}\n.clear .item .msg_time[data-v-091f9922] {\n  position: absolute;\n  top: -18px;\n  font-size: 12px;\n  width: 115px;\n  color: #aaa;\n}\n.clear .item .msg[data-v-091f9922] {\n  word-break: break-all;\n}\n.clear .item .time[data-v-091f9922] {\n  position: absolute;\n  top: -40px;\n  width: 200px;\n  height: 20px;\n  right: -70px;\n}\n.clear .item .head-place[data-v-091f9922] {\n  display: block;\n  width: 50px;\n  height: 50px;\n  position: absolute;\n  top: 0;\n  background: #fff;\n  border-radius: 50px;\n  overflow: hidden;\n  top: -20px;\n}\n.clear .item .head[data-v-091f9922] {\n  width: 50px;\n  height: 50px;\n  border-radius: 50px;\n}\n.clear .item[data-v-091f9922]:after {\n  position: absolute;\n  top: 15px;\n  content: '';\n  width: 0;\n  height: 0;\n}\n.left .msg_time[data-v-091f9922] {\n  left: -15px;\n  text-align: left;\n}\n.left .item[data-v-091f9922] {\n  float: left;\n  margin-left: 80px;\n  color: #313035;\n}\n.left .item[data-v-091f9922]:after {\n  left: -15px;\n  border-top: 15px solid #fff;\n  border-left: 15px solid transparent;\n}\n.left .nickname[data-v-091f9922] {\n  left: -80px;\n}\n.left .time[data-v-091f9922] {\n  text-align: left;\n}\n.left .head-place[data-v-091f9922] {\n  left: -70px;\n}\n.right .msg_time[data-v-091f9922] {\n  right: -15px;\n  text-align: right;\n}\n.right .item[data-v-091f9922] {\n  float: right;\n  margin-right: 80px;\n  color: #fff;\n  background: #137055;\n}\n.right .item[data-v-091f9922]:after {\n  right: -15px;\n  border-top: 15px solid #137055;\n  border-right: 15px solid transparent;\n}\n.right .nickname[data-v-091f9922] {\n  right: -80px;\n}\n.right .time[data-v-091f9922] {\n  text-align: right;\n}\n.right .head-place[data-v-091f9922] {\n  right: -70px;\n}\n@-webkit-keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@keyframes show-chat-odd-data-v-091f9922 {\n0% {\n    margin-right: -480px;\n}\n100% {\n    margin-right: 0;\n}\n}\n@-webkit-keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n@keyframes show-chat-even-data-v-091f9922 {\n0% {\n    margin-left: -480px;\n}\n100% {\n    margin-left: 0;\n}\n}\n", ""]);
 
 // exports
 
@@ -6386,7 +6401,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".container[data-v-18c4d261] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n  -webkit-overflow-scrolling: touch;\n  margin-left: 0 !important;\n  margin-right: 0 !important;\n  padding-left: 0 !important;\n  padding-right: 0 !important;\n  max-width: none !important;\n}\n.container .chat-inner[data-v-18c4d261] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 80px;\n  bottom: 80px;\n}\n.container .title[data-v-18c4d261] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 2;\n}\n.container .title .center[data-v-18c4d261] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .notice-hidden[data-v-18c4d261] {\n  transform: translate(0, -100%);\n}\n.container .notice[data-v-18c4d261] {\n  position: absolute;\n  top: 56px;\n  left: 0;\n  right: 0;\n  width: 94%;\n  z-index: 1;\n  margin: 0 auto;\n  background: #fff;\n  transition: transform 0.5s;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n}\n.container .notice .notice-li[data-v-18c4d261] {\n  padding: 2px 5px;\n}\n.container .notice .notice-li a[data-v-18c4d261] {\n  color: #6d6d6d;\n}\n.container .notice .notice-tool-bar[data-v-18c4d261] {\n  position: absolute;\n  width: 100px;\n  height: 30px;\n  bottom: -30px;\n  left: 50%;\n  transform: translate(-50%, 0);\n  background: #fff;\n  line-height: 30px;\n  text-align: center;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n  z-index: 1;\n}\n.container .chat-container[data-v-18c4d261] {\n  overflow: hidden;\n}\n.container .chat-container .chat-top[data-v-18c4d261] {\n  text-align: center;\n  margin: 5px 0 5px;\n  color: #d1cfd2;\n}\n.container .chat-container .chat-no-people[data-v-18c4d261] {\n  width: 100%;\n  height: 300px;\n  line-height: 300px;\n  text-align: center;\n  color: #d1cfd2;\n}\n.container .bottom[data-v-18c4d261] {\n  position: fixed;\n  width: 100%;\n  height: 80px;\n  bottom: 0;\n  left: 0;\n  z-index: 1;\n  border-top: 1px solid #ddd;\n  background: #f7f6fb;\n}\n.container .bottom .chat[data-v-18c4d261] {\n  width: 100%;\n  display: flex;\n}\n.container .bottom .chat .input[data-v-18c4d261] {\n  flex: 1;\n  padding: 0 4px 4px 4px;\n}\n.container .bottom .chat .input input[data-v-18c4d261] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #e8e7ea;\n  border-radius: 3px;\n  color: #333;\n  font-size: 19px;\n  padding-left: 5px;\n}\n.container .bottom .chat .input .mu-text-field[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .chat .demo-raised-button[data-v-18c4d261] {\n  margin-right: 8px;\n  min-width: 80px;\n  width: 80px;\n  height: 40px;\n  background: #eeeff3;\n  color: #8c8c96;\n}\n.container .bottom .functions[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .functions .fun-li[data-v-18c4d261] {\n  width: 40px;\n  height: 30px;\n  display: inline-block;\n  position: relative;\n  color: #828187;\n  text-align: center;\n}\n.container .bottom .functions .fun-li .iconfont[data-v-18c4d261] {\n  font-size: 20px;\n}\n.container .bottom .functions .emoji-content[data-v-18c4d261] {\n  position: absolute;\n  bottom: 30px;\n  left: -42px;\n  width: 375px;\n  height: 210px;\n  border-top: 1px solid #f3f3f3;\n  overflow: hidden;\n  background-color: #fff;\n}\n.container .bottom .functions .emoji-content .emoji-container[data-v-18c4d261] {\n  width: 10000px;\n}\n.container .bottom .functions .emoji-content .emoji-tabs[data-v-18c4d261] {\n  overflow: auto;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block[data-v-18c4d261] {\n  width: 1170px;\n  height: 200px;\n  float: left;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block span[data-v-18c4d261] {\n  display: inline-block;\n  cursor: pointer;\n  font-size: 26px;\n  min-width: 48px;\n  line-height: 39px;\n  text-align: center;\n  list-style: none;\n}\n.all-chat .online[data-v-18c4d261] {\n  display: inline-block;\n  margin: 5px;\n}\n.all-chat .online img[data-v-18c4d261] {\n  width: 40px;\n  height: 40px;\n  border-radius: 100%;\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n.chat-loading .lds-rolling[data-v-18c4d261] {\n  height: 40px;\n  overflow: hidden;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261],\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #2196f3;\n  border-top-color: transparent;\n  border-radius: 50%;\n  margin: 20px auto 0;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261] {\n  -webkit-animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n  animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  transform: rotate(90deg);\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n@keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n", ""]);
+exports.push([module.i, ".container[data-v-18c4d261] {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  background: #f1f5f8;\n  -webkit-overflow-scrolling: touch;\n  margin-left: 0 !important;\n  margin-right: 0 !important;\n  padding-left: 0 !important;\n  padding-right: 0 !important;\n  max-width: none !important;\n}\n.container .chat-inner[data-v-18c4d261] {\n  position: absolute;\n  width: 100%;\n  overflow-y: scroll;\n  overflow-x: hidden;\n  top: 80px;\n  bottom: 80px;\n}\n.container .title[data-v-18c4d261] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 2;\n}\n.container .title .center[data-v-18c4d261] {\n  flex: 1;\n  padding-left: 8px;\n  padding-right: 8px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 56px;\n  text-align: center;\n}\n.container .notice-hidden[data-v-18c4d261] {\n  transform: translate(0, -100%);\n}\n.container .notice[data-v-18c4d261] {\n  position: absolute;\n  top: 56px;\n  left: 0;\n  right: 0;\n  width: 94%;\n  z-index: 1;\n  margin: 0 auto;\n  background: #fff;\n  transition: transform 0.5s;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n}\n.container .notice .notice-li[data-v-18c4d261] {\n  padding: 2px 5px;\n}\n.container .notice .notice-li a[data-v-18c4d261] {\n  color: #6d6d6d;\n}\n.container .notice .notice-tool-bar[data-v-18c4d261] {\n  position: absolute;\n  width: 100px;\n  height: 30px;\n  bottom: -30px;\n  left: 50%;\n  transform: translate(-50%, 0);\n  background: #fff;\n  line-height: 30px;\n  text-align: center;\n  border-right: 1px #eee solid;\n  border-left: 1px #eee solid;\n  border-bottom: 1px #eee solid;\n  z-index: 1;\n}\n.container .chat-container[data-v-18c4d261] {\n  overflow: hidden;\n}\n.container .chat-container .chat-top[data-v-18c4d261] {\n  text-align: center;\n  margin: 5px 0 5px;\n  color: #d1cfd2;\n}\n.container .chat-container .chat-no-people[data-v-18c4d261] {\n  width: 100%;\n  height: 300px;\n  line-height: 300px;\n  text-align: center;\n  color: #d1cfd2;\n}\n.container .bottom[data-v-18c4d261] {\n  position: fixed;\n  width: 100%;\n  height: 80px;\n  bottom: 0;\n  left: 0;\n  z-index: 1;\n  border-top: 1px solid #ddd;\n  background: #f7f6fb;\n}\n.container .bottom .chat[data-v-18c4d261] {\n  width: 100%;\n  display: flex;\n}\n.container .bottom .chat .input[data-v-18c4d261] {\n  flex: 1;\n  padding: 0 4px 4px 4px;\n}\n.container .bottom .chat .input input[data-v-18c4d261] {\n  width: 100%;\n  height: 42px;\n  box-sizing: border-box;\n  border: 1px solid #e8e7ea;\n  border-radius: 3px;\n  color: #333;\n  font-size: 19px;\n  padding-left: 5px;\n}\n.container .bottom .chat .input .mu-text-field[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .chat .demo-raised-button[data-v-18c4d261] {\n  margin-right: 8px;\n  min-width: 80px;\n  width: 80px;\n  height: 40px;\n  background: #eeeff3;\n  color: #8c8c96;\n}\n.container .bottom .functions[data-v-18c4d261] {\n  width: 100%;\n}\n.container .bottom .functions .fun-li[data-v-18c4d261] {\n  width: 40px;\n  height: 30px;\n  display: inline-block;\n  position: relative;\n  color: #828187;\n  text-align: center;\n}\n.container .bottom .functions .fun-li .iconfont[data-v-18c4d261] {\n  font-size: 20px;\n}\n.container .bottom .functions .emoji-content[data-v-18c4d261] {\n  position: absolute;\n  bottom: 30px;\n  left: -42px;\n  width: 375px;\n  height: 210px;\n  border-top: 1px solid #f3f3f3;\n  overflow: hidden;\n  background-color: #fff;\n}\n.container .bottom .functions .emoji-content .emoji-container[data-v-18c4d261] {\n  width: 10000px;\n}\n.container .bottom .functions .emoji-content .emoji-tabs[data-v-18c4d261] {\n  overflow: auto;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block[data-v-18c4d261] {\n  width: 1170px;\n  height: 200px;\n  float: left;\n}\n.container .bottom .functions .emoji-content .emoji-tabs .emoji-block span[data-v-18c4d261] {\n  display: inline-block;\n  cursor: pointer;\n  font-size: 26px;\n  min-width: 48px;\n  line-height: 39px;\n  text-align: center;\n  list-style: none;\n}\n.all-chat .online[data-v-18c4d261] {\n  display: inline-block;\n  margin: 5px;\n}\n.all-chat .online img[data-v-18c4d261] {\n  width: 40px;\n  height: 40px;\n  border-radius: 100%;\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n.chat-loading .lds-rolling[data-v-18c4d261] {\n  height: 40px;\n  overflow: hidden;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261],\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #137055;\n  border-top-color: transparent;\n  border-radius: 50%;\n  margin: 20px auto 0;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261] {\n  -webkit-animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n  animation: lds-rolling-data-v-18c4d261 1s linear infinite;\n}\n.chat-loading .lds-rolling div[data-v-18c4d261]:after {\n  transform: rotate(90deg);\n}\n@-webkit-keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n@keyframes lds-rolling-data-v-18c4d261 {\n0% {\n    transform: translate(-50%, -50%) rotate(0deg);\n}\n100% {\n    transform: translate(-50%, -50%) rotate(360deg);\n}\n}\n", ""]);
 
 // exports
 
@@ -32948,7 +32963,9 @@ var render = function() {
                 _vm._v(" "),
                 _c("div", { staticClass: "center" }, [
                   _vm._v(
-                    "\n                    聊天(" +
+                    "\n                    " +
+                      _vm._s(_vm.room_name) +
+                      "(" +
                       _vm._s(Object.keys(_vm.getUsers).length) +
                       ")\n                "
                   )
@@ -32980,10 +32997,6 @@ var render = function() {
                 ? _c("div", { staticClass: "chat-no-people" }, [
                     _vm._v("暂无消息,赶紧来占个沙发～")
                   ])
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.getInfos.length !== 0 && _vm.isloading
-                ? _c("div", { staticClass: "chat-loading" }, [_vm._m(0)])
                 : _vm._e(),
               _vm._v(" "),
               _vm._l(_vm.getInfos, function(obj) {
@@ -33220,16 +33233,7 @@ var render = function() {
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "lds-css ng-scope" }, [
-      _c("div", { staticClass: "lds-rolling" }, [_c("div")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -33410,79 +33414,48 @@ var render = function() {
           [
             _c("mu-sub-header", [_vm._v("最近聊天记录")]),
             _vm._v(" "),
-            _c(
-              "mu-list-item",
-              {
-                attrs: { avatar: "", button: "", ripple: false },
-                on: {
-                  click: function($event) {
-                    return _vm.chatwindow("1")
+            _vm._l(_vm.roomsList, function(room, index) {
+              return _c(
+                "mu-list-item",
+                {
+                  key: room.id,
+                  attrs: { avatar: "", button: "", ripple: false },
+                  on: {
+                    click: function($event) {
+                      return _vm.chatwindow(room.id, room.name)
+                    }
                   }
-                }
-              },
-              [
-                _c(
-                  "mu-list-item-action",
-                  [
-                    _c("mu-avatar", [_c("img", { attrs: { src: _vm.house1 } })])
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c("mu-list-item-title", [_vm._v("聊天室1")]),
-                _vm._v(" "),
-                _c(
-                  "mu-list-item-action",
-                  [
-                    _c("span", { staticClass: "unread" }, [
-                      _vm._v(_vm._s(_vm.unRead1))
-                    ]),
-                    _vm._v(" "),
-                    _c("mu-icon", { attrs: { value: "chat_bubble" } })
-                  ],
-                  1
-                )
-              ],
-              1
-            ),
-            _vm._v(" "),
-            _c(
-              "mu-list-item",
-              {
-                attrs: { avatar: "", button: "", ripple: false },
-                on: {
-                  click: function($event) {
-                    return _vm.chatwindow("2")
-                  }
-                }
-              },
-              [
-                _c(
-                  "mu-list-item-action",
-                  [
-                    _c("mu-avatar", [_c("img", { attrs: { src: _vm.house2 } })])
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c("mu-list-item-title", [_vm._v("聊天室2")]),
-                _vm._v(" "),
-                _c(
-                  "mu-list-item-action",
-                  [
-                    _c("span", { staticClass: "unread" }, [
-                      _vm._v(_vm._s(_vm.unRead2))
-                    ]),
-                    _vm._v(" "),
-                    _c("mu-icon", { attrs: { value: "chat_bubble" } })
-                  ],
-                  1
-                )
-              ],
-              1
-            )
+                },
+                [
+                  _c(
+                    "mu-list-item-action",
+                    [
+                      _c("mu-avatar", [
+                        _c("img", { attrs: { src: _vm.house1 } })
+                      ])
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("mu-list-item-title", [_vm._v(_vm._s(room.name))]),
+                  _vm._v(" "),
+                  _c(
+                    "mu-list-item-action",
+                    [
+                      _c("span", { staticClass: "unread" }, [
+                        _vm._v(_vm._s(_vm.unRead1))
+                      ]),
+                      _vm._v(" "),
+                      _c("mu-icon", { attrs: { value: "chat_bubble" } })
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            })
           ],
-          1
+          2
         ),
         _vm._v(" "),
         _c("mu-divider"),
@@ -33682,7 +33655,7 @@ var render = function() {
       ),
       _vm._v(" "),
       _c("div", { staticClass: "tip-user", on: { click: _vm.login } }, [
-        _vm._v("\n      我已有帐号\n    ")
+        _vm._v("\n            我已有帐号\n        ")
       ])
     ])
   ])
@@ -51355,6 +51328,9 @@ var Service = {
     return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/notice', {
       params: data
     });
+  },
+  getRoomsList: function getRoomsList(data) {
+    return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/room');
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (Service);
@@ -52284,7 +52260,7 @@ function svg() {
         vivus.stop().reset().play(2);
       }, 5000);
     },
-    template: "\n      <div class=\"svg\">\n            \u4E16\u754C\u804A\u5929\u5BA4\n        </div>\n    "
+    template: "\n      <div class=\"svg\">\n\n        </div>\n    "
   });
 }
 
@@ -53773,12 +53749,13 @@ function clear() {
 /*!*******************************************!*\
   !*** ./resources/js/utils/queryString.js ***!
   \*******************************************/
-/*! exports provided: queryString */
+/*! exports provided: queryString, queryStringZh */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "queryString", function() { return queryString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "queryStringZh", function() { return queryStringZh; });
 //获取url参数
 function queryString(url, key) {
   var query = url.split('?')[1];
@@ -53789,7 +53766,8 @@ function queryString(url, key) {
 
     for (var i = 0; i < parms.length; i++) {
       var name = parms[i].split('=')[0];
-      var value = parms[i].split('=')[1];
+      var value = parms[i].split('=')[1]; // const value = value1.match(new RegExp('(^|&)' + key + '=([^&]*)(&|$)'));
+
       obj[name] = value;
     }
 
@@ -53799,6 +53777,15 @@ function queryString(url, key) {
   }
 
   return false;
+} //获取url里的中文
+
+function queryStringZh(url, key) {
+  // 正则筛选地址栏
+  var reg = new RegExp('(^|&)' + key + '=([^&]*)(&|$)'); // 匹配目标参数
+
+  var result = url.substr(1).match(reg); // 返回参数值
+
+  return result ? decodeURIComponent(result[2]) : '';
 }
 
 /***/ }),

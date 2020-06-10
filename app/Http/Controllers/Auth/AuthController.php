@@ -23,6 +23,11 @@ class AuthController extends ApiBaseController
     {
         $params = $request->only(['email','avatar','password']);
 
+        //邮箱中不能存在admin/test等字符
+        if($params['email']!=str_replace(['admin','test'],'',$params['email'])){
+            return ResService::msg('你输入的邮箱不合法，请重新输入')->fail();
+        }
+
         $user = User::create([
             'nickname' => substr($params['email'], 0, strpos($params['email'], '@')),
             'email' => $params['email'],
@@ -32,18 +37,8 @@ class AuthController extends ApiBaseController
         ]);
         if ($user) {
             return ResService::data($user)->msg('注册成功，谢谢')->success();
-            /*return [
-                'errno' => 0,
-                'msg' => '注册成功',
-                'data' =>  $user
-            ];*/
         } else {
             return ResService::msg('保存用户到数据库失败')->fail();
-            /*return [
-                'errno' => 1,
-                'msg' => '保存用户到数据库失败',
-                'data' => []
-            ];*/
         }
     }
 

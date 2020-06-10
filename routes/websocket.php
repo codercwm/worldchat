@@ -57,6 +57,7 @@ WebsocketProxy::on('room', function (WebSocket $websocket, $data) {
     $room_user_key = 'online_users_' . $room;
     $online_users = Cache::get($room_user_key);
 
+    $user->avatar = asset_url($user->avatar);
     if ($online_users) {
         $online_users[$user->id] = $user->toArray();
     } else {
@@ -104,7 +105,6 @@ WebsocketProxy::on('message',function(WebSocket $websocket,$data){
         $message->room_id = $room_id;
         $message->msg = $msg;
         $message->img = '';
-        $message->created_at = Carbon::now();
         $message->save();
     }
 

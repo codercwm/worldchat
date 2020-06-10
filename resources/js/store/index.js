@@ -50,7 +50,7 @@ const store = new Vuex.Store({
         // 是否启动tab
         istab: false,
 
-        emojiShow: false
+        emojiShow: false,
     },
     getters: {
         getTotal: state => state.roomdetail.total,
@@ -58,7 +58,7 @@ const store = new Vuex.Store({
         getUsers: state => state.roomdetail.users,
         getInfos: state => state.roomdetail.infos,
         getRobotMsg: state => state.robotmsg,
-        getEmoji: state => state.emojiShow
+        getEmoji: state => state.emojiShow,
     },
     mutations: {
         setTotal(state, value) {

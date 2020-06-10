@@ -25,11 +25,11 @@ const Service = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }),
-
     // 请求公告
     getNotice: data => Axios.get('/notice', {
         params: data
     }),
+    getRoomsList: data => Axios.get('/room'),
 };
 
 export default Service;

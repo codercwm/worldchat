@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCountsTable extends Migration
+class CreateRoomsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateCountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('counts', function (Blueprint $table) {
+        Schema::create('rooms', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id')->comment('用户id');
-            $table->smallInteger('room_id')->comment('房间id');
-            $table->integer('count')->default(0)->comment('消息数量');
+            $table->string('name')->comment('房间名');
+            $table->bigInteger('user_id')->comment('创建人id');
+            $table->string('notice')->nullable()->comment('群公告');
+            $table->timestamps();
         });
     }
 
@@ -28,6 +29,6 @@ class CreateCountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('counts');
+        Schema::dropIfExists('rooms');
     }
 }

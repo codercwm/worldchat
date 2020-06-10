@@ -1,21 +1,22 @@
+import {setTimeout} from "timers";
 <template>
     <div class="hello">
         <div>
             <mu-list>
-                <mu-sub-header>最近聊天记录</mu-sub-header>
-                <mu-list-item avatar button :ripple="false" @click="chatwindow('1')">
+                <mu-sub-header>房间列表</mu-sub-header>
+                <mu-list-item v-for="(room,index) in roomsList" :key="room.id" avatar button :ripple="false" @click="chatwindow(room.id,room.name)">
                     <mu-list-item-action>
                         <mu-avatar>
                             <img :src="house1">
                         </mu-avatar>
                     </mu-list-item-action>
-                    <mu-list-item-title>聊天室1</mu-list-item-title>
+                    <mu-list-item-title>{{room.name}}</mu-list-item-title>
                     <mu-list-item-action>
                         <span class="unread">{{unRead1}}</span>
                         <mu-icon value="chat_bubble"></mu-icon>
                     </mu-list-item-action>
                 </mu-list-item>
-                <mu-list-item avatar button :ripple="false" @click="chatwindow('2')">
+                <!--<mu-list-item avatar button :ripple="false" @click="chatwindow('2')">
                     <mu-list-item-action>
                         <mu-avatar>
                             <img :src="house2">
@@ -26,7 +27,7 @@
                         <span class="unread">{{unRead2}}</span>
                         <mu-icon value="chat_bubble"></mu-icon>
                     </mu-list-item-action>
-                </mu-list-item>
+                </mu-list-item>-->
             </mu-list>
             <mu-divider></mu-divider>
             <mu-list>
@@ -52,16 +53,24 @@
     import socket from '../socket';
     import {mapState} from "vuex";
     import {ROBOT_URL, HOST_URL1, HOST_URL2} from "../const/index";
+    import url from "../api/server";
 
     export default {
         data() {
             return {
                 house1: HOST_URL1,
                 house2: HOST_URL2,
-                robot: ROBOT_URL
+                robot: ROBOT_URL,
+                roomsList:[],
             };
         },
         async mounted() {
+            //获取聊天室列表
+            const rooms_res = await url.getRoomsList();
+            if(0==rooms_res.data.errno){
+                this.roomsList = rooms_res.data.data;
+            }
+
             this.$store.commit("setTab", true);
 
             // 只全局监听一次
@@ -73,12 +82,12 @@
             }
         },
         methods: {
-            async chatwindow(room_id) {
+            async chatwindow(room_id,room_name) {
                 const user_id = this.user_id;
                 if (!user_id) {
                     const res = await Confirm({
                         title: "提示",
-                        content: "聊天请先登录，但是你可以查看聊天记录哦~"
+                        content: "你好，请先登录"
                     });
                     if (res === "submit") {
                         this.$router.push({path: "login"});
@@ -86,7 +95,7 @@
                     return;
                 }
                 this.$store.commit("setTab", false);
-                this.$router.push({path: "/chat", query: {room_id: room_id}});
+                this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
             },
             chatRobot() {
                 this.$store.commit("setTab", false);
@@ -110,7 +119,7 @@
                         return state.unRead.room2;
                     }
                     return '';
-                }
+                },
             })
         }
     };

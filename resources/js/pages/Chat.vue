@@ -16,7 +16,7 @@
                         <mu-icon value="chevron_left"></mu-icon>
                     </mu-button>
                     <div class="center">
-                        聊天({{Object.keys(getUsers).length}})
+                        {{room_name}}({{Object.keys(getUsers).length}})
                     </div>
                     <mu-button icon slot="right" @click="openSimpleDialog">
                         <mu-icon value="people"></mu-icon>
@@ -36,13 +36,13 @@
             <div class="chat-inner">
                 <div class="chat-container">
                     <div v-if="getInfos.length === 0" class="chat-no-people">暂无消息,赶紧来占个沙发～</div>
-                    <div v-if="getInfos.length !== 0 && isloading" class="chat-loading">
+                    <!--这个是loding转圈圈<div class="chat-loading">
                         <div class="lds-css ng-scope">
                             <div class="lds-rolling">
                                 <div></div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <!-- <div v-if="getInfos.length > 0" class="chat-top">到顶啦~</div> -->
                     <Message v-for="obj in getInfos" :key="obj._id" :is-self="obj.user_id === user_id" :nickname="obj.nickname" :avatar="obj.avatar" :msg="obj.msg" :img="obj.img" :mytime="obj.time" :container="container"></Message>
                     <div class="clear"></div>
@@ -106,6 +106,7 @@
     import emoji from '../utils/emoji';
     import {setItem, getItem} from '../utils/localStorage';
     import {queryString} from '../utils/queryString';
+    import {queryStringZh} from '../utils/queryString';
     import Message from '../components/Message';
     import loading from '../components/loading';
     import Alert from '../components/Alert';
@@ -120,8 +121,8 @@
             const notice = getItem('notice') || {};
             const {noticeBar, noticeVersion} = notice;
             return {
-                isloading: false,
                 room_id: '',
+                room_name: '聊天',
                 container: {},
                 chatValue: '',
                 emoji: emoji,
@@ -134,6 +135,7 @@
         },
         async created() {
             const room_id = queryString(window.location.href, 'room_id');
+            this.room_name = queryStringZh(window.location.href, 'room_name');
             this.room_id = room_id;
             if (!room_id) {
                 this.$router.push({path: '/'});
@@ -154,45 +156,45 @@
             this.noticeVersion = res.data.version;
         },
         async mounted() {
-
-            // 微信 回弹 bug
-            ios();
-            this.container = document.querySelector('.chat-inner');
-            // socket内部，this指针指向问题
-            const that = this;
-            //初始化房间信息，这里时清空了房间信息
-            await this.$store.commit('setRoomDetailInfos');
-            //初始化消息数量
-            await this.$store.commit('setTotal', 0);
-            const obj = {
-                user_id: this.user_id,
-                avatar: this.avatar,
-                room_id: this.room_id,
-                api_token: this.api_token
-            };
-            //对websocket服务器通道路由room发起请求
-            socket.emit('room', obj);
-            //监听服务端进入房间的返回消息
-            socket.on('room', function (obj) {
-                that.$store.commit('setUsers', obj);
-            });
-            //监听服务端退出房间的返回消息
-            socket.on('roomout', function (obj) {
-                that.$store.commit('setUsers', obj);
-            });
             loading.show();
+
             //进入页面获取历史消息
             setTimeout(async () => {
+
+                // 微信 回弹 bug
+                ios();
+                this.container = document.querySelector('.chat-inner');
+                // socket内部，this指针指向问题
+                const that = this;
+                //初始化房间信息，这里时清空了房间信息
+                await this.$store.commit('setRoomDetailInfos');
+                //初始化消息数量
+                await this.$store.commit('setTotal', 0);
+                const obj = {
+                    user_id: this.user_id,
+                    avatar: this.avatar,
+                    room_id: this.room_id,
+                    api_token: this.api_token
+                };
+                //对websocket服务器通道路由room发起请求
+                socket.emit('room', obj);
+                //监听服务端进入房间的返回消息
+                socket.on('room', function (obj) {
+                    that.$store.commit('setUsers', obj);
+                });
+                //监听服务端退出房间的返回消息
+                socket.on('roomout', function (obj) {
+                    that.$store.commit('setUsers', obj);
+                });
+
                 const data = {
                     current: +this.current,//当前页，用于分页
                     room_id: this.room_id,//房间id
                     api_token: this.api_token
                 };
-                this.isloading = true;
 
                 //进入页面首次获取历史聊天记录
                 await this.$store.dispatch('getAllMessHistory', data);
-                this.isloading = false;
                 loading.hide();
 
                 //滚动时获取聊天记录翻页
@@ -208,9 +210,9 @@
                             room_id: this.room_id,
                             api_token: this.api_token
                         };
-                        this.isloading = true;
+                        loading.show();
                         await this.$store.dispatch('getAllMessHistory', data);
-                        this.isloading = false;
+                        loading.hide();
                         //获取完数据后的新高度
                         const current_height2 = this.container.scrollHeight;
                         //把页面滚动回刚才浏览到的位置
@@ -218,16 +220,19 @@
                     }
                 }, 50));
 
-            }, 500);
 
-            // Emoji 表情图标点击后的处理
-            this.$refs.emoji.addEventListener('click', function (e) {
-                var target = e.target || e.srcElement;
-                if (!!target && target.tagName.toLowerCase() === 'span') {
-                    that.chatValue = that.chatValue + target.innerHTML;
-                }
-                e.stopPropagation();
-            });
+                // Emoji 表情图标点击后的处理
+                this.$refs.emoji.addEventListener('click', function (e) {
+                    var target = e.target || e.srcElement;
+                    if (!!target && target.tagName.toLowerCase() === 'span') {
+                        that.chatValue = that.chatValue + target.innerHTML;
+                    }
+                    e.stopPropagation();
+                });
+            }, 1000);
+
+
+
         },
         methods: {
             handleNotice() {
@@ -245,7 +250,7 @@
             },
             handleGithub() {
                 Alert({
-                    content: 'https://github.com/codercwm/WorldChat'
+                    content: 'https://github.com/codercwm/worldchat'
                 });
             },
             handleTips() {

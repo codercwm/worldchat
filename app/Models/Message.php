@@ -11,7 +11,7 @@ class Message extends Model
         2 => 'room2'
     ];
 
-    public $timestamps = false;
+    const UPDATED_AT = null;
 
     public function user(){
         return $this->belongsTo(User::class);

@@ -15,8 +15,8 @@ class CreateMessagesTable extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('msg')->comment('文本消息');
-            $table->string('img')->comment('图片消息');
+            $table->string('msg')->nullable()->comment('文本消息');
+            $table->string('img')->nullable()->comment('图片消息');
             $table->bigInteger('user_id')->comment('用户id');
             $table->smallInteger('room_id')->comment('房间id');
             $table->timestamp('created_at')->comment('创建时间');

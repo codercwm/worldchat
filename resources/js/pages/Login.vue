@@ -45,7 +45,7 @@ export default {
           Toast({
             content: res.data.msg,
             timeout: 1000,
-            background: "#2196f3"
+            background: "#137055"
           });
           this.$store.commit("setUserInfo", {
               type: "user_id",
@@ -66,7 +66,7 @@ export default {
           this.getSvgModal.$root.$options.clear();
           this.$store.commit("setSvgModal", null);
           this.$router.push({ path: "/" });
-          // socket.emit("login", { name });
+          location.reload();
         } else {
           Alert({
             content: res.data.msg

@@ -37,6 +37,8 @@ Route::group(['middleware'=>['auth:api']],function() {
     Route::post('/file/avatar', 'Api\FileController@avatar');
 });
 
+Route::resource('/room','Api\RoomController');
+
 Route::get('/robot', function (Request $request) {
     $info = $request->input('info');
     $key = config('services.robot.key');
