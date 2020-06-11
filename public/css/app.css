@@ -186,7 +186,7 @@ input {
 }
 
 /* ::-webkit-scrollbar{width:0px} */
-@import url(https://fonts.googleapis.com/css?family=Nunito);html,
+html,
 body {
   width: 100%;
   height: 100%;

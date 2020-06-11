@@ -1,5 +1,5 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+//@import url('https://fonts.googleapis.com/css?family=Nunito');
 
 // Variables
 @import 'variables';
@@ -18,18 +18,18 @@ div {
         justify-content: center;
     }
     .mu-appbar {
-        background-color: $theme-color !important;
+        background-color: $THEME_COLOR !important;
     }
 }
 
 .mu-bottom-item-active {
     .mu-bottom-item-icon,
     .mu-bottom-item-text {
-        color: $theme-color !important;
+        color: $THEME_COLOR !important;
     }
 }
 
 .demo-raised-button {
-    background-color: $theme-color !important;
+    background-color: $THEME_COLOR !important;
     color: #fff !important;
 }

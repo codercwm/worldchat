@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import './index.css';
+import '../../../const/index.js';
+import {TOAST_COLOR,TOAST_BACKGROUND} from "../../../const/index";
 
 const root = window.document.body;
 
@@ -17,8 +19,8 @@ export default function Toast(config) {
         data: {
             content: config.content || '',
             timeout: config.timeout || 1500,
-            background: config.background || 'rgba(0, 0, 0, 0.7)',
-            color: config.color || '#fff',
+            background: config.background || TOAST_BACKGROUND,
+            color: config.color || TOAST_COLOR,
             toast: false
         },
         methods: {

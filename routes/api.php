@@ -40,7 +40,7 @@ Route::group(['middleware'=>['auth:api']],function() {
 Route::resource('/room','Api\RoomController');
 
 Route::get('/robot', function (Request $request) {
-    $info = $request->input('info');
+    $info = $request->input('msg');
     $key = config('services.robot.key');
     $url = config('services.robot.api');
     $client = new \GuzzleHttp\Client();

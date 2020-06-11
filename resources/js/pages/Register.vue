@@ -46,8 +46,7 @@
                     if (res.status === "success") {
                         Toast({
                             content: res.data.msg,
-                            timeout: 1000,
-                            background: "#137055"
+                            timeout: 1000
                         });
                         this.$store.commit("setUserInfo", {
                             type: "user_id",
@@ -102,7 +101,9 @@
     };
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="scss" scoped>
+    @import '../../const/index.scss';
+
     .btn-radius {
         width: 100%;
         height: 40px;
@@ -121,32 +122,32 @@
 
     .content {
 
-    .mu-text-field-input {
-        color: #fff;
-    }
+        .mu-text-field-input {
+            color: #fff;
+        }
 
-    .mu-text-field.has-label .mu-text-field-label.float {
-        color: rgba(255, 255, 255, 0.38);
-    }
+        .mu-text-field.has-label .mu-text-field-label.float {
+            color: rgba(255, 255, 255, 0.38);
+        }
 
-    .mu-text-field-label {
-        color: #fff;
-    }
+        .mu-text-field-label {
+            color: #fff;
+        }
 
-    .mu-text-field-line {
-        background-color: rgba(255, 255, 255, 0.38);
-    }
+        .mu-text-field-line {
+            background-color: rgba(255, 255, 255, 0.38);
+        }
 
-    .mu-text-field-focus-line {
-        background-color: #fff;
-    }
+        .mu-text-field-focus-line {
+            background-color: #fff;
+        }
 
-    .tip-user {
-        width: 100%;
-        text-align: center;
-        margin-top: 20px;
-        color: #fff;
-    }
+        .tip-user {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+            color: #fff;
+        }
 
     }
 
@@ -156,27 +157,27 @@
         right: 0;
         top: 0;
         bottom: 0;
-        background-image: url('//worldchat.test/img/bg.jpg');
+        background: $BACKGROUND_COLOR;
         background-size: 100% 100%;
         background-position: center center;
 
-    .mu-appbar {
-        text-align: center;
+        .mu-appbar {
+            text-align: center;
 
-    .mu-flat-button-label {
-        font-size: 20px;
-    }
+            .mu-flat-button-label {
+                font-size: 20px;
+            }
 
-    }
+        }
 
-    .content {
-        width: 80%;
-        margin: 70px auto 20px;
+        .content {
+            width: 80%;
+            margin: 70px auto 20px;
 
-    .mu-text-field {
-        width: 100%;
-    }
+            .mu-text-field {
+                width: 100%;
+            }
 
-    }
+        }
     }
 </style>

@@ -3,7 +3,7 @@ import {setTimeout} from "timers";
     <div class="hello">
         <div>
             <mu-list>
-                <mu-sub-header>房间列表</mu-sub-header>
+                <mu-sub-header>群列表</mu-sub-header>
                 <mu-list-item v-for="(room,index) in roomsList" :key="room.id" avatar button :ripple="false" @click="chatwindow(room.id,room.name)">
                     <mu-list-item-action>
                         <mu-avatar>
@@ -50,18 +50,18 @@ import {setTimeout} from "timers";
 
 <script>
     import Confirm from "../components/Confirm";
-    import socket from '../socket';
     import {mapState} from "vuex";
-    import {ROBOT_URL, HOST_URL1, HOST_URL2} from "../const/index";
+    import {ROBOT_IMG, HOUSE_IMG1, HOUSE_IMG2,HOST_NAME} from "../../const/index";
     import url from "../api/server";
 
     export default {
         data() {
             return {
-                house1: HOST_URL1,
-                house2: HOST_URL2,
-                robot: ROBOT_URL,
+                house1: HOUSE_IMG1,
+                house2: HOUSE_IMG2,
+                robot: ROBOT_IMG,
                 roomsList:[],
+                HOST_NAME:HOST_NAME,
             };
         },
         async mounted() {
@@ -80,6 +80,7 @@ import {setTimeout} from "timers";
                     this.$store.commit("setLoginState", true);
                 }
             }
+
         },
         methods: {
             async chatwindow(room_id,room_name) {
@@ -97,7 +98,7 @@ import {setTimeout} from "timers";
                 this.$store.commit("setTab", false);
                 this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
             },
-            chatRobot() {
+            async chatRobot() {
                 this.$store.commit("setTab", false);
                 this.$router.push({path: "/robot"});
             }

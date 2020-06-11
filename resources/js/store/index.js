@@ -10,8 +10,8 @@ import {
 } from '../utils/localStorage';
 import {
     ROBOT_NAME,
-    ROBOT_URL
-} from '../const';
+    ROBOT_IMG
+} from '../../const';
 import dateFormat from "../utils/date";
 
 Vue.use(Vuex);
@@ -36,7 +36,7 @@ const store = new Vuex.Store({
         // 存放机器人开场白
         robotmsg: [{
                 username: ROBOT_NAME,
-                avatar: ROBOT_URL,
+                avatar: ROBOT_IMG,
                 msg: '你好，我是机器人，有什么想知道的可以问我，但我也不一定知道。',
                 time:dateFormat(new Date(), "yyyy-MM-dd HH:mm:ss"),
             }
@@ -180,7 +180,7 @@ const store = new Vuex.Store({
             commit
         }, data) {
             const nickname = ROBOT_NAME;
-            const avatar = ROBOT_URL;
+            const avatar = ROBOT_IMG;
             const res = await url.getRobotMessage(data);
 
             if (res) {

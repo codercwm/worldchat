@@ -23,7 +23,8 @@ export default function Alert(config) {
             title: config.title || '提示',
             content: config.content || '',
             btn: config.btn || '确定',
-            html: config.html || ''
+            html: config.html || '',
+            bodyListener:'',
         },
         methods: {
             close() {
@@ -42,5 +43,7 @@ export default function Alert(config) {
         </div>
       </div>
     `
-    }));
+    })).then(res => {
+
+    });
 }

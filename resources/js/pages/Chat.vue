@@ -81,18 +81,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="fun-li" @click="handleTips">
+                    <!--<div class="fun-li" @click="handleTips">
                         <i class="icon iconfont icon-zanshang"></i>
-                    </div>
+                    </div>-->
                     <div class="fun-li" @click="handleGithub">
                         <i class="icon iconfont icon-wenti"></i>
                     </div>
                 </div>
                 <div class="chat">
-                    <div class="input" @keyup.enter="submess">
-                        <input type="text" v-model="chatValue">
+                    <div class="input" @keyup.enter="sendmessage">
+                        <input id="msg_input" maxlength="100" type="text" v-model="chatValue">
                     </div>
-                    <mu-button class="demo-raised-button" primary @click="submess">发送</mu-button>
+                    <mu-button class="demo-raised-button" primary @click="sendmessage">发送</mu-button>
                 </div>
                 <input id="inputFile" name='inputFile' type='file' multiple='mutiple' accept="image/*;capture=camera" style="display: none" @change="fileup">
             </div>
@@ -115,6 +115,7 @@
     import {setTimeout} from 'timers';
     import ios from '../utils/ios';
     import socket from '../socket';
+    import {HOST_NAME} from "../../const/index";
 
     export default {
         data() {
@@ -130,7 +131,8 @@
                 openSimple: false,
                 noticeBar: !!noticeBar,
                 noticeList: [],
-                noticeVersion: noticeVersion || '20181222'
+                noticeVersion: noticeVersion || '20181222',
+                HOST_NAME:HOST_NAME,
             };
         },
         async created() {
@@ -166,26 +168,10 @@
                 this.container = document.querySelector('.chat-inner');
                 // socket内部，this指针指向问题
                 const that = this;
-                //初始化房间信息，这里时清空了房间信息
+                //初始化房间信息，这里是清空了房间信息
                 await this.$store.commit('setRoomDetailInfos');
                 //初始化消息数量
                 await this.$store.commit('setTotal', 0);
-                const obj = {
-                    user_id: this.user_id,
-                    avatar: this.avatar,
-                    room_id: this.room_id,
-                    api_token: this.api_token
-                };
-                //对websocket服务器通道路由room发起请求
-                socket.emit('room', obj);
-                //监听服务端进入房间的返回消息
-                socket.on('room', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
-                //监听服务端退出房间的返回消息
-                socket.on('roomout', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
 
                 const data = {
                     current: +this.current,//当前页，用于分页
@@ -229,6 +215,23 @@
                     }
                     e.stopPropagation();
                 });
+
+                const obj = {
+                    user_id: this.user_id,
+                    avatar: this.avatar,
+                    room_id: this.room_id,
+                    api_token: this.api_token
+                };
+                //对websocket服务器通道路由room发起请求
+                socket.emit('room', obj);
+                //监听服务端进入房间的返回消息
+                socket.on('room', function (obj) {
+                    that.$store.commit('setUsers', obj);
+                });
+                //监听服务端退出房间的返回消息
+                socket.on('roomout', function (obj) {
+                    that.$store.commit('setUsers', obj);
+                });
             }, 1000);
 
 
@@ -256,7 +259,7 @@
             handleTips() {
                 Alert({
                     title: '请我喝杯咖啡',
-                    html: '<div><img style="width: 200px" src="//worldchat.test/img/bg.jpg" /></div>'
+                    html: '<div><img style="width: 200px" src="//'+this.HOST_NAME+'/img/hoster.jpg" /></div>'
                 });
             },
             goback() {
@@ -304,13 +307,14 @@
                 const file = document.getElementById('inputFile');
                 file.click();
             },
-            submess() {
+            sendmessage() {
                 // 判断发送信息是否为空
-                if (this.chatValue !== '') {
-                    if (this.chatValue.length > 200) {
+                if (this.chatValue.trim() !== '') {
+                    if (this.chatValue.length > 240) {
                         Alert({
                             content: '字数不能超过100'
                         });
+                        document.getElementById("msg_input").blur();
                         return;
                     }
                     const msg = inHTMLData(this.chatValue); // 防止xss
@@ -331,6 +335,7 @@
                     Alert({
                         content: '内容不能为空'
                     });
+                    document.getElementById("msg_input").blur();
                 }
             }
         },
@@ -355,5 +360,6 @@
         }
     };
 </script>
-
-<style lang="stylus" rel="stylesheet/stylus" src="./Chat.styl" scoped></style>
+<style lang="scss" scoped>
+    @import "./Chat";
+</style>
