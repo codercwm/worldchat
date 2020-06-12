@@ -160,6 +160,10 @@
         async mounted() {
             window.addEventListener('beforeunload', this.roomOut,true);
 
+            //初始化房间消息，这里是清空了房间消息
+            await this.$store.commit('setRoomDetailInfos');
+            //初始化消息数量
+            await this.$store.commit('setTotal', 0);
 
             //进入页面获取历史消息
             setTimeout(async () => {
@@ -169,10 +173,7 @@
                 this.container = document.querySelector('.chat-inner');
                 // socket内部，this指针指向问题
                 const that = this;
-                //初始化房间消息，这里是清空了房间消息
-                await this.$store.commit('setRoomDetailInfos');
-                //初始化消息数量
-                await this.$store.commit('setTotal', 0);
+
 
                 // Emoji 表情图标点击后的处理
                 this.$refs.emoji.addEventListener('click', function (e) {
