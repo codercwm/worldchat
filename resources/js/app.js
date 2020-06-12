@@ -50,7 +50,7 @@ socket.on('connect', async () => {
             room_id: room_id,
             api_token: api_token
         };
-        socket.emit('room', obj);
+        socket.emit('roomin', obj);
 
         //这里干嘛要这样？不知道，先不要
         /*if (store.state.isDiscount) {

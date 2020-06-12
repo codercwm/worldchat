@@ -21,7 +21,8 @@ const store = new Vuex.Store({
         userInfo: {
             avatar: getItem('avatar'),
             user_id: getItem('user_id'),
-            api_token: getItem('api_token')
+            api_token: getItem('api_token'),
+            nickname: getItem('nickname'),
         },
         isDiscount: false,
         isLogin: false,

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Index from '../pages/Loan';
 import Chat from '../pages/Chat';
+import PChat from '../pages/PChat';
 import Robot from '../pages/Robot';
 import Home from '../pages/Home';
 import Avatar from '../pages/Avatar';
@@ -33,6 +34,11 @@ const router = new Router({
                     path: '/chat',
                     name: 'chat',
                     component: Chat
+                },
+                {
+                    path: '/pchat',
+                    name: 'pchat',
+                    component: PChat
                 },
                 {
                     path: '/robot',

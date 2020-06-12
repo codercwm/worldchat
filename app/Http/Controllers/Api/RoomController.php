@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class RoomController extends Controller
 {
     public function index(Request $request){
-        $list = Room::get();
+        $list = Room::where('display',1)->get();
         return ResService::data($list)->success();
     }
 }

@@ -19,13 +19,13 @@
                     </mu-list-item-action>
                     <mu-list-item-title>修改头像</mu-list-item-title>
                 </mu-list-item>
-                <mu-list-item button @click="handleTips">
+                <!--<mu-list-item button @click="handleTips">
                     <mu-list-item-action>
                         <mu-icon slot="left" value="inbox"/>
                     </mu-list-item-action>
                     <mu-list-item-title>赞助一下</mu-list-item-title>
-                </mu-list-item>
-                <mu-list-item button @click="handleGithub">
+                </mu-list-item>-->
+                <!--<mu-list-item button @click="handleGithub">
                     <mu-list-item-action>
                         <mu-icon slot="left" value="grade"/>
                     </mu-list-item-action>
@@ -36,7 +36,7 @@
                         <mu-icon slot="left" value="drafts"/>
                     </mu-list-item-action>
                     <mu-list-item-title>清除缓存</mu-list-item-title>
-                </mu-list-item>
+                </mu-list-item>-->
             </mu-list>
             <!--<mu-divider/>-->
         </div>
@@ -59,12 +59,12 @@
         },
         async mounted() {
             this.$store.commit("setTab", true);
-            if (!this.user_id) {
+            if (!this.api_token) {
                 const data = await Confirm({
                     title: "提示",
-                    content: "需要登录后才能查看哦~",
+                    content: "您好，请先登录",
                     ok: "去登录",
-                    cancel: "返回首页"
+                    cancel: "取消"
                 });
                 if (data === "submit") {
                     this.$router.push("/login");
@@ -132,7 +132,8 @@
         computed: {
             ...mapState({
                 user_id: state => state.userInfo.user_id,
-                avatar: state => state.userInfo.avatar
+                avatar: state => state.userInfo.avatar,
+                api_token: state => state.userInfo.api_token,
             })
         }
     };

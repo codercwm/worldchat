@@ -23,13 +23,6 @@ Route::post('/login', 'Auth\AuthController@login');
 
 Route::group(['middleware'=>['auth:api']],function() {
 
-    Route::get('/notice', function () {
-        return response()->json([
-            'title' => '欢迎您的到来，你可以自由发言',
-            'href' => 'JavaScript:;',
-        ]);
-    });
-
     Route::get('/message/history', 'Api\MessageController@history');
 
     Route::post('/file/chatsimg', 'Api\FileController@chatsimg');
@@ -49,6 +42,15 @@ Route::get('/robot', function (Request $request) {
     ]);
     $contents = json_decode($response->getBody()->getContents(),true);
 
-    \Illuminate\Support\Facades\Log::info(print_r($contents,true));
+    $log = $contents;
+    $log['msg'] = $info;
+    \App\Services\LogService::write(print_r($log,true),'Robot');
     return response()->json(['data' => $contents]);
+});
+
+Route::get('/notice', function () {
+    return response()->json([
+        'title' => '欢迎您的到来，你可以自由发言',
+        'href' => 'JavaScript:;',
+    ]);
 });

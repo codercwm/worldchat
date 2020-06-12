@@ -19,22 +19,36 @@ if (! function_exists('asset_url')) {
 
 if (! function_exists('room_out')) {
     function room_out(WebSocket $websocket, $data) {
-        $user = User::where('id',$websocket->getUserId())->first();
-
+        //获取房间id
         if (empty($data['room_id'])) {
             return;
         }
-        $room_id = $data['room_id'];
-        $room = Message::$ROOMLIST[$room_id];
+        $room_id = intval($data['room_id']);
+
+        //这个房间未登录用户也可以进入
+        if(1==$room_id){
+            if(check_login($websocket)){
+                $user = User::where('id',$websocket->getUserId())->first();
+            }else{
+                $user = collect();
+                $user->id = $data['user_id'];
+                $user->nickname = $data['nickname'];
+                $user->avatar = '';
+            }
+        }else{
+            if(!check_login($websocket)) return;
+            $user = User::where('id',$websocket->getUserId())->first();
+        }
+
+        $room = 'room'.$room_id;
         // 更新在线用户信息
         $room_users_key = 'online_users_' . $room;
         $online_users = Cache::get($room_users_key);
-        if (!empty($online_users[$user->id])) {
+
+        if (isset($online_users[$user->id])) {
             unset($online_users[$user->id]);
             Cache::forever($room_users_key, $online_users);
         }
-        LogService::write($user->nickname . ' 退出 ' . $room . '房间', 'room_in_out');
-        LogService::write($room.'房间里面有nickname : '.json_encode(array_column($online_users,'nickname')), 'room_in_out');
         $websocket->to($room)->emit('roomout', $online_users);
         $websocket->leave([$room]);
 
@@ -47,7 +61,6 @@ if (! function_exists('check_login')) {
         if($websocket->getUserId()){
             return true;
         }
-        $websocket->emit('login', '你还未登录，请先登录');
         return false;
     }
 }

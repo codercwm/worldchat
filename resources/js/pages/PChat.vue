@@ -160,7 +160,6 @@
         async mounted() {
             window.addEventListener('beforeunload', this.roomOut,true);
 
-            loading.show();
 
             //进入页面获取历史消息
             setTimeout(async () => {
@@ -170,44 +169,6 @@
                 this.container = document.querySelector('.chat-inner');
                 // socket内部，this指针指向问题
                 const that = this;
-                //初始化房间消息，这里是清空了房间消息
-                await this.$store.commit('setRoomDetailInfos');
-                //初始化消息数量
-                await this.$store.commit('setTotal', 0);
-
-                const data = {
-                    current: +this.current,//当前页，用于分页
-                    room_id: this.room_id,//房间id
-                    api_token: this.api_token
-                };
-
-                //进入页面首次获取历史聊天记录
-                await this.$store.dispatch('getAllMessHistory', data);
-                loading.hide();
-
-                //滚动时获取聊天记录翻页
-                this.container.addEventListener('scroll', debounce(async (e) => {
-
-                    //获取当前的高度
-                    const current_height1 = this.container.scrollHeight;
-                    //e.target.scrollTop表示动了多少
-                    if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
-                        this.$store.commit('setCurrent', +this.getCurrent + 1);
-                        const data = {
-                            current: +this.getCurrent,
-                            room_id: this.room_id,
-                            api_token: this.api_token
-                        };
-                        loading.show();
-                        await this.$store.dispatch('getAllMessHistory', data);
-                        loading.hide();
-                        //获取完数据后的新高度
-                        const current_height2 = this.container.scrollHeight;
-                        //把页面滚动回刚才浏览到的位置
-                        this.container.scrollTop = current_height2-current_height1-100;
-                    }
-                }, 50));
-
 
                 // Emoji 表情图标点击后的处理
                 this.$refs.emoji.addEventListener('click', function (e) {
@@ -236,8 +197,6 @@
                     that.$store.commit('setUsers', obj);
                 });
             }, 1000);
-
-
 
         },
         methods: {
@@ -277,11 +236,6 @@
                 const that = this;
                 const file1 = document.getElementById('inputFile').files[0];
                 if (file1) {
-                    const formdata = new window.FormData();
-                    formdata.append('file', file1);
-                    formdata.append('api_token', that.api_token);
-                    formdata.append('room_id', that.room_id);
-                    this.$store.dispatch('uploadImg', formdata);
                     const fr = new window.FileReader();
                     fr.onload = function () {
                         const obj = {
@@ -291,7 +245,8 @@
                             msg: '',
                             room_id: that.room_id,
                             time: new Date(),
-                            api_token: that.api_token
+                            api_token: that.api_token,
+                            nickname: that.nickname
                         };
                         socket.emit('message', obj);
                     };
@@ -326,6 +281,7 @@
                         api_token: this.api_token,
                         nickname: this.nickname,
                     };
+
                     // 传递消息信息
                     socket.emit('message', obj);
                     this.chatValue = '';

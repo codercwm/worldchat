@@ -50,6 +50,7 @@ import {setTimeout} from "timers";
 
 <script>
     import Confirm from "../components/Confirm";
+    import InputConfirm from "../components/InputConfirm";
     import {mapState} from "vuex";
     import {ROBOT_IMG, HOUSE_IMG1, HOUSE_IMG2,HOST_NAME} from "../../const/index";
     import url from "../api/server";
@@ -84,19 +85,43 @@ import {setTimeout} from "timers";
         },
         methods: {
             async chatwindow(room_id,room_name) {
-                const user_id = this.user_id;
-                if (!user_id) {
-                    const res = await Confirm({
-                        title: "提示",
-                        content: "你好，请先登录"
-                    });
-                    if (res === "submit") {
-                        this.$router.push({path: "login"});
+                if(1==room_id){
+                    if (!this.user_id) {
+                        const res = await InputConfirm({
+                            title: "输入您的名字"
+                        });
+                        if (res.res === "submit") {
+                            this.$store.commit("setUserInfo", {
+                                type: "user_id",
+                                value: (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+                            });
+                            this.$store.commit("setUserInfo", {
+                                type: "nickname",
+                                value: res.content
+                            });
+                        }else{
+                            return;
+                        }
+
                     }
+                    this.$store.commit("setTab", false);
+                    this.$router.push({path: "/Pchat", query: {room_id: room_id,room_name:room_name}});
+                    return;
+                }else{
+                    if (!this.api_token) {
+                        const res = await Confirm({
+                            title: "提示",
+                            content: "您好，请先登录"
+                        });
+                        if (res === "submit") {
+                            this.$router.push({path: "login"});
+                        }
+                        return;
+                    }
+                    this.$store.commit("setTab", false);
+                    this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
                     return;
                 }
-                this.$store.commit("setTab", false);
-                this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
             },
             async chatRobot() {
                 this.$store.commit("setTab", false);
@@ -108,6 +133,7 @@ import {setTimeout} from "timers";
                 user_id: state => state.userInfo.user_id,
                 avatar: state => state.userInfo.avatar,
                 api_token: state => state.userInfo.api_token,
+                nickname: state => state.userInfo.nickname,
                 isLogin: state => state.isLogin,
                 unRead1: state =>{
                     if(state.unRead.room1>0){

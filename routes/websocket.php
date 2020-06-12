@@ -5,7 +5,6 @@ use Swoole\Http\Request;
 use App\Services\WebSocket\WebSocket;
 use App\Services\Websocket\Facades\Websocket as WebsocketProxy;
 use App\Models\User;
-use App\Models\Count;
 use App\Services\LogService;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Message;
@@ -28,29 +27,46 @@ WebsocketProxy::on('connect', function (WebSocket $websocket, Request $request) 
     //
     //$websocket->emit('connect', '欢迎访问聊天室');
 
-    // 建立连接时绑定认证用户信息
-    $websocket->loginUsing(auth('api')->user());
 
+    if($login_user = auth('api')->user()){
+        // 建立连接时绑定认证用户信息
+        $websocket->loginUsing(auth('api')->user());
+    }
 });
 
-WebsocketProxy::on('login', function (WebSocket $websocket, $data) {
+/*WebsocketProxy::on('login', function (WebSocket $websocket, $data) {
     if(!check_login($websocket)) return;
     //$websocket->loginUsing($user);
-});
+});*/
 
-WebsocketProxy::on('room', function (WebSocket $websocket, $data) {
-    if(!check_login($websocket)) return;
-    $user = User::where('id',$websocket->getUserId())->first();
+WebsocketProxy::on('roomin', function (WebSocket $websocket, $data) {
     //获取房间id
     if (empty($data['room_id'])) {
         return;
     }
-    $room_id = $data['room_id'];
+
+    $room_id = intval($data['room_id']);
+
+    //这个房间未登录用户也可以进入
+    if(1==$room_id){
+        if(check_login($websocket)){
+            $user = User::where('id',$websocket->getUserId())->first();
+        }else{
+            $user = collect();
+            $user->id = $data['user_id'];
+            $user->nickname = $data['nickname'];
+            $user->avatar = '';
+        }
+    }else{
+        if(!check_login($websocket)) return;
+        $user = User::where('id',$websocket->getUserId())->first();
+    }
+
     //重置用户与fd关联
     Redis::command('hset',['socket_id', $user->id, $websocket->getSender()]);
 
     //用户加入房间
-    $room = Message::$ROOMLIST[$room_id];
+    $room = 'room'.$room_id;
     $websocket->join($room);
 
     //更新在线用户信息
@@ -59,9 +75,19 @@ WebsocketProxy::on('room', function (WebSocket $websocket, $data) {
 
     $user->avatar = asset_url($user->avatar);
     if ($online_users) {
-        $online_users[$user->id] = $user->toArray();
+        $online_users[$user->id] = [
+            'nickname' => $user->nickname,
+            'avatar' => $user->avatar,
+            'id' => $user->id,
+        ];
     } else {
-        $online_users = [$user->id => $user->toArray()];
+        $online_users = [
+            $user->id => [
+                'nickname' => $user->nickname,
+                'avatar' => $user->avatar,
+                'id' => $user->id,
+            ]
+        ];
     }
     Cache::forever($room_user_key, $online_users);
 
@@ -72,34 +98,49 @@ WebsocketProxy::on('room', function (WebSocket $websocket, $data) {
     //这个to设置room_id是什么原理？
     //to是设置发送放，如果传入int就会被识别为用户的fd进行发送
     //如果传入的是str，就会被识别为room_id，然后它会用room_id获取出这个房间的所有fd进行发送
-    $websocket->to($room)->emit('room', $online_users);
-
+    $websocket->to($room)->emit('roomin', $online_users);
 
 });
 
 WebsocketProxy::on('roomout', function (WebSocket $websocket, $data) {
-    if(!check_login($websocket)) return;
     room_out($websocket, $data);
 });
 
 WebsocketProxy::on('disconnect', function (WebSocket $websocket, $data) {
-    if(!check_login($websocket)) return;
     room_out($websocket, $data);
 });
 
 WebsocketProxy::on('message',function(WebSocket $websocket,$data){
-    if(!check_login($websocket)) return;
-    $user = User::where('id',$websocket->getUserId())->first();
+    //获取房间id
+    if (empty($data['room_id'])) {
+        return;
+    }
+
+    $room_id = intval($data['room_id']);
+
+    //这个房间未登录用户也可以进入
+    if(1==$room_id){
+        if(check_login($websocket)){
+            $user = User::where('id',$websocket->getUserId())->first();
+        }else{
+            $user = collect();
+            $user->id = $data['user_id'];
+            $user->nickname = $data['nickname'];
+            $user->avatar = '';
+        }
+    }else{
+        if(!check_login($websocket)) return;
+        $user = User::where('id',$websocket->getUserId())->first();
+    }
     // 获取消息内容
     $msg = $data['msg'];
     $img = $data['img']??'';
-    $room_id = intval($data['room_id']);
     $time = $data['time'];
     if((empty($msg) && empty($img)) || empty($room_id)){
         return;
     }
     //只保存文字消息到数据库，图片消息在图片上传操作中已保存，无需在这里保存
-    if($msg){
+    if($msg && (1!=$room_id)){
         $message = new Message();
         $message->user_id = $user->id;
         $message->room_id = $room_id;
