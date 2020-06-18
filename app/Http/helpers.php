@@ -23,7 +23,7 @@ if (! function_exists('room_out')) {
         if (empty($data['room_id'])) {
             return;
         }
-        $room_id = intval($data['room_id']);
+        $room_id = $data['room_id'];
 
         //这个房间未登录用户也可以进入
         if(1==$room_id){
@@ -55,6 +55,9 @@ if (! function_exists('room_out')) {
     }
 }
 
+if (! function_exists('room_in')) {
+
+}
 
 if (! function_exists('check_login')) {
     function check_login(WebSocket $websocket){

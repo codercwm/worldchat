@@ -8,6 +8,7 @@ import Home from '../pages/Home';
 import Avatar from '../pages/Avatar';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import DaFeiJi from '../pages/dafeiji/index';
 import BaseTransition from '../layout/BaseTransition';
 import loading from '../components/loading';
 
@@ -66,6 +67,11 @@ const router = new Router({
             path: '/login',
             name: 'Login',
             component: Login
+        },
+        {
+            path: '/dafeiji',
+            name: 'DaFeiJi',
+            component: DaFeiJi
         }
     ]
 });

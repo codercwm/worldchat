@@ -45,10 +45,10 @@ WebsocketProxy::on('roomin', function (WebSocket $websocket, $data) {
         return;
     }
 
-    $room_id = intval($data['room_id']);
+    $room_id = $data['room_id'];
 
-    //这个房间未登录用户也可以进入
-    if(1==$room_id){
+    //这个房间和不是数组id的房间未登录用户也可以进入
+    if(1==$room_id || !is_numeric($room_id)){
         if(check_login($websocket)){
             $user = User::where('id',$websocket->getUserId())->first();
         }else{
@@ -116,10 +116,10 @@ WebsocketProxy::on('message',function(WebSocket $websocket,$data){
         return;
     }
 
-    $room_id = intval($data['room_id']);
+    $room_id = $data['room_id'];
 
-    //这个房间未登录用户也可以进入
-    if(1==$room_id){
+    //这个房间和不是数组id的房间未登录用户也可以进入
+    if(1==$room_id || !is_numeric($room_id)){
         if(check_login($websocket)){
             $user = User::where('id',$websocket->getUserId())->first();
         }else{
@@ -150,7 +150,7 @@ WebsocketProxy::on('message',function(WebSocket $websocket,$data){
     }
 
     //将消息广播给房间内所有用户
-    $room = Message::$ROOMLIST[$room_id];
+    $room = 'room'.$room_id;
 
     $message_data = [
         'user_id' => $user->id,
@@ -163,4 +163,47 @@ WebsocketProxy::on('message',function(WebSocket $websocket,$data){
     ];
     $websocket->to($room)->emit('message',$message_data);
 
+});
+
+WebsocketProxy::on('dafeiji', function (WebSocket $websocket, $data) {
+    //获取房间id
+    if (empty($data['room_id']) || !isset($data['enemy_x'])) {
+        return;
+    }
+
+    $room = 'room'.$data['room_id'];
+
+    LogService::write("给{$room}返回一个敌机{$data['enemy_id']}--{$data['enemy_x']}",'akdlfjsaklfjsadlkf');
+    //$enemy_id = rand(1,12);
+    $websocket->to($room)->emit('dafeiji', ['enemy_id'=>$data['enemy_id'],'enemy_x'=>$data['enemy_x']]);
+});
+
+WebsocketProxy::on('dafeiji_position', function (WebSocket $websocket, $data) {
+    //获取房间id
+    if (empty($data['room_id']) || !isset($data['user_id'],$data['position_x'],$data['position_y'])) {
+        return;
+    }
+
+    $room = 'room'.$data['room_id'];
+
+    $res = [
+        'user_id' => $data['user_id'],
+        'position_x' => $data['position_x'],
+        'position_y' => $data['position_y'],
+    ];
+    $websocket->to($room)->emit('dafeiji_position', $res);
+});
+
+WebsocketProxy::on('dafeiji_dazhao', function (WebSocket $websocket, $data) {
+    //获取房间id
+    if (!isset($data['user_id'])) {
+        return;
+    }
+
+    $room = 'room'.$data['room_id'];
+
+    $res = [
+        'user_id' => $data['user_id'],
+    ];
+    $websocket->to($room)->emit('dafeiji_dazhao', $res);
 });

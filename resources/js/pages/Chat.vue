@@ -162,81 +162,82 @@
 
             loading.show();
 
-            //进入页面获取历史消息
-            setTimeout(async () => {
+            this.$nextTick(function () {
+                //进入页面获取历史消息
+                setTimeout(async () => {
 
-                // 微信 回弹 bug
-                ios();
-                this.container = document.querySelector('.chat-inner');
-                // socket内部，this指针指向问题
-                const that = this;
-                //初始化房间消息，这里是清空了房间消息
-                await this.$store.commit('setRoomDetailInfos');
-                //初始化消息数量
-                await this.$store.commit('setTotal', 0);
+                    // 微信 回弹 bug
+                    ios();
+                    this.container = document.querySelector('.chat-inner');
+                    // socket内部，this指针指向问题
+                    const that = this;
+                    //初始化房间消息，这里是清空了房间消息
+                    await this.$store.commit('setRoomDetailInfos');
+                    //初始化消息数量
+                    await this.$store.commit('setTotal', 0);
 
-                const data = {
-                    current: +this.current,//当前页，用于分页
-                    room_id: this.room_id,//房间id
-                    api_token: this.api_token
-                };
+                    const data = {
+                        current: +this.current,//当前页，用于分页
+                        room_id: this.room_id,//房间id
+                        api_token: this.api_token
+                    };
 
-                //进入页面首次获取历史聊天记录
-                await this.$store.dispatch('getAllMessHistory', data);
-                loading.hide();
+                    //进入页面首次获取历史聊天记录
+                    await this.$store.dispatch('getAllMessHistory', data);
+                    loading.hide();
 
-                //滚动时获取聊天记录翻页
-                this.container.addEventListener('scroll', debounce(async (e) => {
+                    //滚动时获取聊天记录翻页
+                    this.container.addEventListener('scroll', debounce(async (e) => {
 
-                    //获取当前的高度
-                    const current_height1 = this.container.scrollHeight;
-                    //e.target.scrollTop表示动了多少
-                    if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
-                        this.$store.commit('setCurrent', +this.getCurrent + 1);
-                        const data = {
-                            current: +this.getCurrent,
-                            room_id: this.room_id,
-                            api_token: this.api_token
-                        };
-                        loading.show();
-                        await this.$store.dispatch('getAllMessHistory', data);
-                        loading.hide();
-                        //获取完数据后的新高度
-                        const current_height2 = this.container.scrollHeight;
-                        //把页面滚动回刚才浏览到的位置
-                        this.container.scrollTop = current_height2-current_height1-100;
-                    }
-                }, 50));
+                        //获取当前的高度
+                        const current_height1 = this.container.scrollHeight;
+                        //e.target.scrollTop表示动了多少
+                        if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
+                            this.$store.commit('setCurrent', +this.getCurrent + 1);
+                            const data = {
+                                current: +this.getCurrent,
+                                room_id: this.room_id,
+                                api_token: this.api_token
+                            };
+                            loading.show();
+                            await this.$store.dispatch('getAllMessHistory', data);
+                            loading.hide();
+                            //获取完数据后的新高度
+                            const current_height2 = this.container.scrollHeight;
+                            //把页面滚动回刚才浏览到的位置
+                            this.container.scrollTop = current_height2 - current_height1 - 100;
+                        }
+                    }, 50));
 
 
-                // Emoji 表情图标点击后的处理
-                this.$refs.emoji.addEventListener('click', function (e) {
-                    var target = e.target || e.srcElement;
-                    if (!!target && target.tagName.toLowerCase() === 'span') {
-                        that.chatValue = that.chatValue + target.innerHTML;
-                    }
-                    e.stopPropagation();
-                });
+                    // Emoji 表情图标点击后的处理
+                    this.$refs.emoji.addEventListener('click', function (e) {
+                        var target = e.target || e.srcElement;
+                        if (!!target && target.tagName.toLowerCase() === 'span') {
+                            that.chatValue = that.chatValue + target.innerHTML;
+                        }
+                        e.stopPropagation();
+                    });
 
-                const obj = {
-                    user_id: this.user_id,
-                    avatar: this.avatar,
-                    room_id: this.room_id,
-                    api_token: this.api_token,
-                    nickname: this.nickname,
-                };
-                //对websocket服务器通道路由room发起请求
-                socket.emit('roomin', obj);
-                //监听服务端进入房间的返回消息
-                socket.on('roomin', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
-                //监听服务端退出房间的返回消息
-                socket.on('roomout', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
-            }, 1000);
-
+                    const obj = {
+                        user_id: this.user_id,
+                        avatar: this.avatar,
+                        room_id: this.room_id,
+                        api_token: this.api_token,
+                        nickname: this.nickname,
+                    };
+                    //对websocket服务器通道路由room发起请求
+                    socket.emit('roomin', obj);
+                    //监听服务端进入房间的返回消息
+                    socket.on('roomin', function (obj) {
+                        that.$store.commit('setUsers', obj);
+                    });
+                    //监听服务端退出房间的返回消息
+                    socket.on('roomout', function (obj) {
+                        that.$store.commit('setUsers', obj);
+                    });
+                }, 1000);
+            });
 
 
         },
