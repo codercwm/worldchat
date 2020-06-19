@@ -667,7 +667,7 @@
                     var selfplanX=e.touches[0].pageX-(playerArr[vueThis.user_id].playerWidth/2);
                     var selfplanY=e.touches[0].pageY-(playerArr[vueThis.user_id].playerHeight/2);
                     moveSend(selfplanX,selfplanY);
-                },true);
+                },{passive:false});
 
                 document.onkeyup = function(ee)
                 {
