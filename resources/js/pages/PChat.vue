@@ -116,6 +116,7 @@
     import ios from '../utils/ios';
     import socket from '../socket';
     import {HOST_NAME} from "../../const/index";
+    import InputConfirm from "../components/InputConfirm";
 
     export default {
         data() {
@@ -133,6 +134,7 @@
                 noticeList: [],
                 noticeVersion: noticeVersion || '20181222',
                 HOST_NAME:HOST_NAME,
+                readyTimer:null,
             };
         },
         async created() {
@@ -141,10 +143,28 @@
             this.room_id = room_id;
             if (!room_id) {
                 this.$router.push({path: '/'});
+                return;
             }
-            if (!this.user_id) {
-                // 防止未登录
-                this.$router.push({path: '/login'});
+            if(1==room_id){
+                if (!this.user_id) {
+                    const res = await InputConfirm({
+                        title: "输入您的名字"
+                    });
+                    if (res.res === "submit") {
+                        this.$store.commit("setUserInfo", {
+                            type: "user_id",
+                            value: 'ui'+(((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+                        });
+                        this.$store.commit("setUserInfo", {
+                            type: "nickname",
+                            value: res.content
+                        });
+                    }else{
+                        this.$router.push({path: '/'});
+                    }
+                }
+            }else{
+                this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
             }
             const data = {
                 room_id: this.room_id
@@ -158,6 +178,7 @@
             this.noticeVersion = res.data.version;
         },
         async mounted() {
+            loading.show();
             window.addEventListener('beforeunload', this.roomOut,true);
 
             //初始化房间消息，这里是清空了房间消息
@@ -165,42 +186,45 @@
             //初始化消息数量
             await this.$store.commit('setTotal', 0);
 
-            //进入页面获取历史消息
-            setTimeout(async () => {
-
-                // 微信 回弹 bug
-                ios();
-                this.container = document.querySelector('.chat-inner');
-                // socket内部，this指针指向问题
-                const that = this;
+            // 微信 回弹 bug
+            ios();
+            this.container = document.querySelector('.chat-inner');
+            // socket内部，this指针指向问题
+            const that = this;
 
 
-                // Emoji 表情图标点击后的处理
-                this.$refs.emoji.addEventListener('click', function (e) {
-                    var target = e.target || e.srcElement;
-                    if (!!target && target.tagName.toLowerCase() === 'span') {
-                        that.chatValue = that.chatValue + target.innerHTML;
-                    }
-                    e.stopPropagation();
-                });
+            // Emoji 表情图标点击后的处理
+            this.$refs.emoji.addEventListener('click', function (e) {
+                var target = e.target || e.srcElement;
+                if (!!target && target.tagName.toLowerCase() === 'span') {
+                    that.chatValue = that.chatValue + target.innerHTML;
+                }
+                e.stopPropagation();
+            });
 
-                const obj = {
-                    user_id: this.user_id,
-                    avatar: this.avatar,
-                    room_id: this.room_id,
-                    api_token: this.api_token,
-                    nickname: this.nickname,
+            this.readyTimer = setInterval(async () => {
+                if (document.readyState === 'complete') {
+                    const obj = {
+                        user_id: this.user_id,
+                        avatar: this.avatar,
+                        room_id: this.room_id,
+                        api_token: this.api_token,
+                        nickname: this.nickname,
+                    };
+                    //对websocket服务器通道路由room发起请求
+                    socket.emit('roomin', obj);
+                    //监听服务端进入房间的返回消息
+                    socket.on('roomin', function (obj) {
+                        that.$store.commit('setUsers', obj);
+                    });
+                    //监听服务端退出房间的返回消息
+                    socket.on('roomout', function (obj) {
+                        that.$store.commit('setUsers', obj);
+                    });
+                    clearInterval(this.readyTimer);
+                    this.readyTimer = null;
+                    loading.hide();
                 };
-                //对websocket服务器通道路由room发起请求
-                socket.emit('roomin', obj);
-                //监听服务端进入房间的返回消息
-                socket.on('roomin', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
-                //监听服务端退出房间的返回消息
-                socket.on('roomout', function (obj) {
-                    that.$store.commit('setUsers', obj);
-                });
             }, 1000);
 
         },

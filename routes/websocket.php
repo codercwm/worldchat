@@ -62,6 +62,10 @@ WebsocketProxy::on('roomin', function (WebSocket $websocket, $data) {
         $user = User::where('id',$websocket->getUserId())->first();
     }
 
+    if(empty($user)||empty($user->id)||empty($user->nickname)){
+        return;
+    }
+
     //重置用户与fd关联
     Redis::command('hset',['socket_id', $user->id, $websocket->getSender()]);
 
@@ -91,8 +95,8 @@ WebsocketProxy::on('roomin', function (WebSocket $websocket, $data) {
     }
     Cache::forever($room_user_key, $online_users);
 
-    LogService::write($user->nickname . ' 加入 ' . $room . '房间', 'room_in_out');
-    LogService::write($room.'房间里面有nickname : '.json_encode(array_column($online_users,'nickname')), 'room_in_out');
+    //LogService::write($user->nickname . ' 加入 ' . $room . '房间', 'room_in_out');
+    //LogService::write($room.'房间里面有nickname : '.json_encode(array_column($online_users,'nickname')), 'room_in_out');
 
     //广播消息 给房间内所有用户
     //这个to设置room_id是什么原理？

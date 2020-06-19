@@ -54,6 +54,7 @@ import {setTimeout} from "timers";
     import {mapState} from "vuex";
     import {ROBOT_IMG, HOUSE_IMG1, HOUSE_IMG2,HOST_NAME} from "../../const/index";
     import url from "../api/server";
+    import loading from "../components/loading";
 
     export default {
         data() {
@@ -66,10 +67,12 @@ import {setTimeout} from "timers";
             };
         },
         async mounted() {
+            loading.show();
             //获取聊天室列表
             const rooms_res = await url.getRoomsList();
             if(0==rooms_res.data.errno){
                 this.roomsList = rooms_res.data.data;
+                loading.hide();
             }
 
             this.$store.commit("setTab", true);
@@ -85,43 +88,13 @@ import {setTimeout} from "timers";
         },
         methods: {
             async chatwindow(room_id,room_name) {
+                this.$store.commit("setTab", false);
                 if(1==room_id){
-                    if (!this.user_id) {
-                        const res = await InputConfirm({
-                            title: "输入您的名字"
-                        });
-                        if (res.res === "submit") {
-                            this.$store.commit("setUserInfo", {
-                                type: "user_id",
-                                value: (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
-                            });
-                            this.$store.commit("setUserInfo", {
-                                type: "nickname",
-                                value: res.content
-                            });
-                        }else{
-                            return;
-                        }
-
-                    }
-                    this.$store.commit("setTab", false);
                     this.$router.push({path: "/Pchat", query: {room_id: room_id,room_name:room_name}});
-                    return;
                 }else{
-                    if (!this.api_token) {
-                        const res = await Confirm({
-                            title: "提示",
-                            content: "您好，请先登录"
-                        });
-                        if (res === "submit") {
-                            this.$router.push({path: "login"});
-                        }
-                        return;
-                    }
-                    this.$store.commit("setTab", false);
                     this.$router.push({path: "/chat", query: {room_id: room_id,room_name:room_name}});
-                    return;
                 }
+                return;
             },
             async chatRobot() {
                 this.$store.commit("setTab", false);

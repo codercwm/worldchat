@@ -299,7 +299,7 @@ class WebSocket
 
         foreach ($rooms as $room) {
             $clients = $this->room->getClients($room);
-            LogService::write($room.'里面有fd : '.json_encode($clients),'room_in_out');
+            //LogService::write($room.'里面有fd : '.json_encode($clients),'room_in_out');
             // fallback fd with wrong type back to fds array
             if (empty($clients) && is_numeric($room)) {
                 $fds[] = $room;

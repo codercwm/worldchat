@@ -116,6 +116,8 @@
     import ios from '../utils/ios';
     import socket from '../socket';
     import {HOST_NAME} from "../../const/index";
+    import InputConfirm from "../components/InputConfirm";
+    import Confirm from "../components/Confirm";
 
     export default {
         data() {
@@ -133,6 +135,7 @@
                 noticeList: [],
                 noticeVersion: noticeVersion || '20181222',
                 HOST_NAME:HOST_NAME,
+                readyTimer:null,
             };
         },
         async created() {
@@ -142,10 +145,27 @@
             if (!room_id) {
                 this.$router.push({path: '/'});
             }
-            if (!this.user_id) {
+            if(1==room_id){
+                this.$router.push({path: "/Pchat", query: {room_id: room_id,room_name:room_name}});
+                return;
+            }else{
+                if (!this.api_token) {
+                    const res = await Confirm({
+                        title: "提示",
+                        content: "您好，请先登录"
+                    });
+                    if (res === "submit") {
+                        this.$router.push({path: "login"});
+                    }else{
+                        this.$router.push({path: '/'});
+                    }
+                    return;
+                }
+            }
+            /*if (!this.user_id) {
                 // 防止未登录
                 this.$router.push({path: '/login'});
-            }
+            }*/
             const data = {
                 room_id: this.room_id
             };
@@ -158,67 +178,61 @@
             this.noticeVersion = res.data.version;
         },
         async mounted() {
+            loading.show();
             window.addEventListener('beforeunload', this.roomOut,true);
 
-            loading.show();
+            // 微信 回弹 bug
+            ios();
+            this.container = document.querySelector('.chat-inner');
+            // socket内部，this指针指向问题
+            const that = this;
+            //初始化房间消息，这里是清空了房间消息
+            await this.$store.commit('setRoomDetailInfos');
+            //初始化消息数量
+            await this.$store.commit('setTotal', 0);
 
-            this.$nextTick(function () {
-                //进入页面获取历史消息
-                setTimeout(async () => {
+            const data = {
+                current: +this.current,//当前页，用于分页
+                room_id: this.room_id,//房间id
+                api_token: this.api_token
+            };
 
-                    // 微信 回弹 bug
-                    ios();
-                    this.container = document.querySelector('.chat-inner');
-                    // socket内部，this指针指向问题
-                    const that = this;
-                    //初始化房间消息，这里是清空了房间消息
-                    await this.$store.commit('setRoomDetailInfos');
-                    //初始化消息数量
-                    await this.$store.commit('setTotal', 0);
+            //进入页面首次获取历史聊天记录
+            await this.$store.dispatch('getAllMessHistory', data);
 
+            //滚动时获取聊天记录翻页
+            this.container.addEventListener('scroll', debounce(async (e) => {
+
+                //获取当前的高度
+                const current_height1 = this.container.scrollHeight;
+                //e.target.scrollTop表示动了多少
+                if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
+                    this.$store.commit('setCurrent', +this.getCurrent + 1);
                     const data = {
-                        current: +this.current,//当前页，用于分页
-                        room_id: this.room_id,//房间id
+                        current: +this.getCurrent,
+                        room_id: this.room_id,
                         api_token: this.api_token
                     };
-
-                    //进入页面首次获取历史聊天记录
                     await this.$store.dispatch('getAllMessHistory', data);
-                    loading.hide();
 
-                    //滚动时获取聊天记录翻页
-                    this.container.addEventListener('scroll', debounce(async (e) => {
-
-                        //获取当前的高度
-                        const current_height1 = this.container.scrollHeight;
-                        //e.target.scrollTop表示动了多少
-                        if (e.target.scrollTop >= 0 && e.target.scrollTop < 50) {
-                            this.$store.commit('setCurrent', +this.getCurrent + 1);
-                            const data = {
-                                current: +this.getCurrent,
-                                room_id: this.room_id,
-                                api_token: this.api_token
-                            };
-                            loading.show();
-                            await this.$store.dispatch('getAllMessHistory', data);
-                            loading.hide();
-                            //获取完数据后的新高度
-                            const current_height2 = this.container.scrollHeight;
-                            //把页面滚动回刚才浏览到的位置
-                            this.container.scrollTop = current_height2 - current_height1 - 100;
-                        }
-                    }, 50));
+                    //获取完数据后的新高度
+                    const current_height2 = this.container.scrollHeight;
+                    //把页面滚动回刚才浏览到的位置
+                    this.container.scrollTop = current_height2 - current_height1 - 100;
+                }
+            }, 50));
 
 
-                    // Emoji 表情图标点击后的处理
-                    this.$refs.emoji.addEventListener('click', function (e) {
-                        var target = e.target || e.srcElement;
-                        if (!!target && target.tagName.toLowerCase() === 'span') {
-                            that.chatValue = that.chatValue + target.innerHTML;
-                        }
-                        e.stopPropagation();
-                    });
-
+            // Emoji 表情图标点击后的处理
+            this.$refs.emoji.addEventListener('click', function (e) {
+                var target = e.target || e.srcElement;
+                if (!!target && target.tagName.toLowerCase() === 'span') {
+                    that.chatValue = that.chatValue + target.innerHTML;
+                }
+                e.stopPropagation();
+            });
+            this.readyTimer = setInterval(async () => {
+                if (document.readyState === 'complete') {
                     const obj = {
                         user_id: this.user_id,
                         avatar: this.avatar,
@@ -236,8 +250,12 @@
                     socket.on('roomout', function (obj) {
                         that.$store.commit('setUsers', obj);
                     });
-                }, 1000);
-            });
+
+                    clearInterval(this.readyTimer);
+                    this.readyTimer = null;
+                    loading.hide();
+                };
+            }, 1000);
 
 
         },

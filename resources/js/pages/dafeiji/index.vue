@@ -60,7 +60,7 @@
 <template>
     <div>
         <div id='shade' style="">
-            <div id='button'>
+            <div v-show="showStart" id='button'>
                 <button @click="start">开始游戏</button>
                 <button @click="invite">邀请好友一起玩</button>
             </div>
@@ -121,7 +121,7 @@
 <script>
 
     import socket from "../../socket";
-    import {queryString} from "../../utils/queryString";
+    import {queryString,queryStringChange} from "../../utils/queryString";
     import InputConfirm from "../../components/InputConfirm";
     import {mapState} from "vuex";
     import loading from '../../components/loading';
@@ -133,6 +133,8 @@
             return {
                 startFun:null,
                 room_id:null,
+                readyTimer:null,
+                showStart:false,
             };
         },
         computed: {
@@ -174,7 +176,8 @@
             if(room_id){
                 this.room_id = room_id;
             }else{
-                this.room_id = (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+                this.room_id = 'fr'+(((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+                window.history.pushState(null,null,queryStringChange(window.location.href, 'room_id',this.room_id));//向当前url添加参数
             }
 
             const vueThis = this;
@@ -187,7 +190,7 @@
                 if (res.res === "submit") {
                     this.$store.commit("setUserInfo", {
                         type: "user_id",
-                        value: (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+                        value: 'ui'+(((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
                     });
                     this.$store.commit("setUserInfo", {
                         type: "nickname",
@@ -200,15 +203,15 @@
             }
 
             loading.show();
-            this.$nextTick(function () {
-                setTimeout(async () => {
+            this.readyTimer = setInterval(async (data) => {
+                if (document.readyState === 'complete') {
                     //进入房间
                     const obj = {
-                        user_id: this.user_id,
-                        avatar: this.avatar,
-                        room_id: this.room_id,
-                        api_token: this.api_token,
-                        nickname: this.nickname,
+                        user_id: vueThis.user_id,
+                        avatar: vueThis.avatar,
+                        room_id: vueThis.room_id,
+                        api_token: vueThis.api_token,
+                        nickname: vueThis.nickname,
                     };
                     //对websocket服务器通道路由room发起请求
                     socket.emit('roomin', obj);
@@ -231,8 +234,13 @@
                         vueThis.$store.commit('setUsers', obj);
                     });
                     loading.hide();
-                },1000);
-            });
+                    clearInterval(vueThis.readyTimer);
+                    vueThis.readyTimer = null;
+                    vueThis.showStart = true;
+
+                }
+
+            },5000);
 
             //存够10个可以放大招
             var canDazhaoIni = 10;
@@ -253,6 +261,9 @@
             var bulletNum = document.getElementsByClassName('eshot').length;
             var enemyNum = document.getElementsByClassName('enemy').length;
 
+            //发送位置的频聊，为了减少移动时对服务器的请求
+            var moveSendStep = 0;
+            var moveSendStepIni = 5;//移动5次之后才像服务器发送位置
 
             // 窗口
             var game = document.getElementById('game');
@@ -607,6 +618,25 @@
                 }
             });
 
+            function moveSend(selfplanX,selfplanY) {
+                playerArr[vueThis.user_id].position(selfplanX,selfplanY)
+
+                if(moveSendStep<moveSendStepIni){
+                    moveSendStep+=1;
+                    return;
+                }else{
+                    moveSendStep = 0;
+                }
+                //把战机位置告诉服务器
+                const dafeijiPosition = {
+                    user_id:vueThis.user_id,
+                    position_x:selfplanX,
+                    position_y:selfplanY,
+                    room_id:vueThis.room_id,
+                };
+                socket.emit('dafeiji_position', dafeijiPosition);
+            }
+
             this.startFun = function(){
                 document.getElementById('shade').style.display = 'none';
 
@@ -623,21 +653,21 @@
 
                 //移动
                 game.addEventListener("mousemove",function(){
+
                     var oevent=window.event||arguments[0];
-                    var chufa=oevent.srcElement||oevent.target;
                     var selfplanX=oevent.clientX-(playerArr[vueThis.user_id].playerWidth/2);
                     var selfplanY=oevent.clientY-(playerArr[vueThis.user_id].playerHeight/2);
-                    playerArr[vueThis.user_id].position(selfplanX,selfplanY)
-                    //把战机位置告诉服务器
-                    const dafeijiPosition = {
-                        user_id:vueThis.user_id,
-                        position_x:selfplanX,
-                        position_y:selfplanY,
-                        room_id:vueThis.room_id,
-                    };
-                    socket.emit('dafeiji_position', dafeijiPosition);
+
+                    moveSend(selfplanX,selfplanY);
                 },true);
 
+                game.addEventListener("touchmove", function(e) {
+
+                    if(e.touches.length > 1 || e.scale && e.scale !== 1) return;
+                    var selfplanX=e.touches[0].pageX-(playerArr[vueThis.user_id].playerWidth/2);
+                    var selfplanY=e.touches[0].pageY-(playerArr[vueThis.user_id].playerHeight/2);
+                    moveSend(selfplanX,selfplanY);
+                },true);
 
                 document.onkeyup = function(ee)
                 {

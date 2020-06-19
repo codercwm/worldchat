@@ -26,3 +26,22 @@ export function queryStringZh (url,key) {
     // 返回参数值
     return result ? decodeURIComponent(result[2]) : ''
 }
+
+export function queryStringChange(uri, par, par_value) {
+    var pattern = par + '=([^&]*)';
+    var replaceText = par + '=' + par_value;
+    if (uri.match(pattern)) {//如果连接中带这个参数
+        var tmp = '/\\' + par + '=[^&]*/';
+        tmp = uri.replace(eval(tmp), replaceText);
+        return (tmp);
+    }
+    else {
+        if (uri.match('[\?]')) {//如果链接中不带这个参数但是有其他参数
+            return uri + '&' + replaceText;
+        }
+        else {//如果链接中没有带任何参数
+            return uri + '?' + replaceText;
+        }
+    }
+    return uri + '\n' + par + '\n' + par_value;
+}
